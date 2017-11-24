@@ -20,6 +20,6 @@ let
             return '';
         }});
 
-        console.log(itemResult);
+        console.log(jsBeautify(itemResult));
     });
 
