@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/qq89987112/api-tools#readme",
   "dependencies": {
+    "fs-extra": "^4.0.2",
+    "js-beautify": "^1.7.4",
     "lodash": "^4.17.4",
     "supertest": "^3.0.0"
   },

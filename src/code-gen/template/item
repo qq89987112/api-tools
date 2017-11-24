@@ -1,0 +1,13 @@
+import axios from "axios"
+export default {
+<% apis.forEach((item)=>{%>
+  <%= item.comment ? item.comment :'' %>
+  <%= item.name %>(<%= item.params&&item.params.join(',') %>){
+    return axios.<%= item.method.toLowerCase() %>(`<%= item.url %><%= getParams(item) %>`)<% if(item.params&&item.method.toLowerCase()==='post'){%>
+    ,{
+    <%= item.params.join(',') %>
+  }
+  <%}%>
+  },
+<%}) %>
+}

@@ -4,7 +4,10 @@
     "prefix":"/meat",
     "value":[
       {
-        "url":
+        "name":"getBaiDu",
+        "url":"http://www.baidu.com",
+        "method":"GET",
+        "params":["title"]
       }
     ]
   }
