@@ -20,8 +20,7 @@
     "fs-extra": "^4.0.2",
     "js-beautify": "^1.7.4",
     "lodash": "^4.17.4",
-    "supertest": "^3.0.0",
-    "tapable": "^0.2.8"
+    "supertest": "^3.0.0"
   },
   "devDependencies": {}
 }
