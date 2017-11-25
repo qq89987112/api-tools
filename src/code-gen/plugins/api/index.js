@@ -19,25 +19,7 @@ module.exports = (app) => {
 
         apis.forEach((item) => {
             let
-                apiConfigs = item.value,
-                prefix = item.prefix;
-
-                if(prefix){
-                    apiConfigs.forEach((item)=>{
-                        if(item.url){
-                            let
-                                parasReg = /\$\{(.+)\}/g,
-                                results,
-                                params = [];
-                                item.url = prefix+item.url;
-                                while(results = parasReg.exec(item.url)){
-                                    params.push(results[1]);
-                                }
-
-                                item.params2 = params;
-                        }
-                    });
-                }
+                apiConfigs = item.value;
 
                 if (apiConfigs) {
                     let itemResult = _.template(itemTemplate)({
