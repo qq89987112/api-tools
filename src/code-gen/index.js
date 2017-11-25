@@ -50,6 +50,8 @@ module.exports = (apis) => {
                     }
                     return pages;
                 },pages);
+
+                //遍历生成每个页面
                 Object.entries(pages).forEach((item)=>{
 
                     let

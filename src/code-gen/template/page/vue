@@ -1,6 +1,6 @@
 <template>
     <div class="<%= name %>-page">
-
+        <%= name %>-page
     </div>
 </template>
 <script>
@@ -16,7 +16,9 @@
             <%= item.name %>(){
                 let <%= item.params&&item.params.join(',') %>;
 
-                    <%= item.fileName %>.<%= item.name %>(<%= item.params&&item.params.join(',') %>)
+                    <%= item.fileName %>.<%= item.name %>(<%= item.params&&item.params.join(',') %>).then((data)=>{
+
+                    })
             },
             <%}) %>
         },
