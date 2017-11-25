@@ -4,6 +4,7 @@
     "prefix": "https://api.douban.com/v2/movie",
     "value": [
       {
+        "flag":"movie.theaters",
         "name": "fetchTheaters",
         "url": "/in_theaters",
         "method": "GET",

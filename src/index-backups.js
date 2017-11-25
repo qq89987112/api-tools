@@ -3,12 +3,12 @@ let
     jsBeautify = require('js-beautify').js,
     fse = require('fs-extra'),
     path = require('path'),
-    itemTemplate = fse.readFileSync(path.join(__dirname, './template/api/item')),
+    itemTemplate = fse.readFileSync(path.join(__dirname, './template/api-gen/item')),
     beautifyOps = {
         indent_with_tabs: true,
         max_preserve_newlines: -1
     },
-    vueTemplate = fse.readFileSync(path.join(__dirname, './template/page/vue'));
+    vueTemplate = fse.readFileSync(path.join(__dirname, './template/page-gen/vue'));
 
 
 module.exports = (apis) => {
@@ -66,7 +66,7 @@ module.exports = (apis) => {
                             dependencies:Array.from(dependencies),
                             apis
                         });
-                        //  拿到所有 api 的依赖地址
+                        //  拿到所有 api-gen 的依赖地址
 
 
                         // 开始生成
