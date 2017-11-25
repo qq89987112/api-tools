@@ -1,21 +1,19 @@
 [
   {
-    "name":"meat",
-    "prefix":"/meat",
+    "name":"movie",
+    "prefix":"https://api.douban.com/v2/movie",
     "value":[
       {
-        "name":"getBaiDu",
-        "url":"http://www.baidu.com",
+        "name":"fetchTheaters",
+        "url":"/in_theaters",
         "method":"GET",
-        "params":["title"],
         "page":"main"
-      },
-      {
-        "name":"getBaiDu2",
-        "url":"http://www.baidu.com",
-        "method":"POST",
+      },{
+        "name":"fetchSubject",
+        "url":"/subject/${id}",
+        "method":"get",
         "params":["title"],
-        "page":"main"
+        "page":"details"
       }
     ]
   }

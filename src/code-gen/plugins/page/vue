@@ -14,8 +14,9 @@
         methods: {
             <% apis&&apis.forEach((item)=>{%>
             <%= item.name %>(){
-                let <%= item.params&&item.params.join(',') %>;
-
+                <% if(item.params){%>
+                    let <%= item.params.join(',') %>;
+                <%} %>
                     <%= item.fileName %>.<%= item.name %>(<%= item.params&&item.params.join(',') %>).then((data)=>{
 
                     })

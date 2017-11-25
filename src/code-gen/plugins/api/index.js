@@ -19,25 +19,44 @@ module.exports = (app) => {
 
         apis.forEach((item) => {
             let
-                apiConfigs = item.value;
-            if (apiConfigs) {
-                let itemResult = _.template(itemTemplate)({
-                    apis: apiConfigs,
-                    getParams: (item) => {
-                        if (item.method.toUpperCase() === 'GET' && item.params) {
-                            let results = item.params.map((item) => {
-                                return `${item}=\$\{${item}\}`;
-                            });
-                            return `?${results.join('&')}`
+                apiConfigs = item.value,
+                prefix = item.prefix;
+
+                if(prefix){
+                    apiConfigs.forEach((item)=>{
+                        if(item.url){
+                            let
+                                parasReg = /\$\{(.+)\}/g,
+                                results,
+                                params = [];
+                                item.url = prefix+item.url;
+                                while(results = parasReg.exec(item.url)){
+                                    params.push(results[1]);
+                                }
+
+                                item.params2 = params;
                         }
-                        return '';
-                    }
-                });
+                    });
+                }
 
-                fse.outputFileSync(apiFiles[item.name], jsBeautify(itemResult, beautifyOps));
+                if (apiConfigs) {
+                    let itemResult = _.template(itemTemplate)({
+                        apis: apiConfigs,
+                        getParams: (item) => {
+                            if (item.method.toUpperCase() === 'GET' && item.params) {
+                                let results = item.params.map((item) => {
+                                    return `${item}=\$\{${item}\}`;
+                                });
+                                return `?${results.join('&')}`
+                            }
+                            return '';
+                        }
+                    });
 
-                app.$emit("api-generated", apiConfigs);
-            }
+                    fse.outputFileSync(apiFiles[item.name], jsBeautify(itemResult, beautifyOps));
+
+                    app.$emit("api-generated", apiConfigs);
+                }
         });
 
         app.$emit("apis-generated");
