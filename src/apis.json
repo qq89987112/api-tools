@@ -1,19 +1,22 @@
 [
   {
-    "name":"movie",
-    "prefix":"https://api.douban.com/v2/movie",
-    "value":[
+    "name": "movie",
+    "prefix": "https://api.douban.com/v2/movie",
+    "value": [
       {
-        "name":"fetchTheaters",
-        "url":"/in_theaters",
-        "method":"GET",
-        "page":"main"
-      },{
-        "name":"fetchSubject",
-        "url":"/subject/${id}",
-        "method":"get",
-        "params":["title"],
-        "page":"details"
+        "name": "fetchTheaters",
+        "url": "/in_theaters",
+        "method": "GET",
+        "page": "main"
+      },
+      {
+        "name": "fetchSubject",
+        "url": "/subject/${id}",
+        "method": "get",
+        "params": [
+          "title"
+        ],
+        "page": "details"
       }
     ]
   }
