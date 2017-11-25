@@ -40,6 +40,7 @@ module.exports = (app) => {
                     pageName = item[0],
                     apis = item[1],
                     pageOutput = `./dist/page/${pageName}.vue`,
+
                     //  拿到所有 api 的依赖地址
                     dependencies = new Set(apis.map((item)=>{
                         return  `import ${item.fileName} from '${path.relative(path.dirname(pageOutput),path.dirname(apiFiles[item.fileName])).replace(/\\/g,"/")+`/${item.fileName}.js`}'`
