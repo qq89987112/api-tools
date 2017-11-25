@@ -1,0 +1,22 @@
+[
+  {
+    "name":"meat",
+    "prefix":"/meat",
+    "value":[
+      {
+        "name":"getBaiDu",
+        "url":"http://www.baidu.com",
+        "method":"GET",
+        "params":["title"],
+        "page":"main"
+      },
+      {
+        "name":"getBaiDu2",
+        "url":"http://www.baidu.com",
+        "method":"POST",
+        "params":["title"],
+        "page":"main"
+      }
+    ]
+  }
+]
