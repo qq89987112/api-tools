@@ -1,12 +1,8 @@
 <template>
     <div class="<%= name %>-page">
-        <% if(form.length>0){%>
-            <% form.forEach((item)=>{%>
-                <input class="<%= item.name %>" type="<%= item.type %>" v-model="<%= item.name %>">
-            <%}) %>
-        <%}else{%>
-            <%= name %>-page
-        <%} %>
+            <%= (form||[]).
+            map((item)=>`<input class="${item.name}" type="${item.type}" v-model="${item.name}">`)
+            .concat(form.length==0&&`${name}-page`||[]).join('\r\n') %>
     </div>
 </template>
 <script>
@@ -15,7 +11,7 @@
         name: '<%= name %>-page',
         data() {
             return {
-                <%= (form||[]).map((item)=>item.name).join(',\r\n')%>
+                <%= (form||[]).map((item)=>`${item.name}:''`).join(',\r\n')%>
             }
         },
         methods: {
