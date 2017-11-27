@@ -1,8 +1,10 @@
 let
-    api = require('./api-gen/index'),
-    page = require('./page-gen/index');
+    api = require('./api-gen'),
+    page = require('./page-gen'),
+    testApi = require('./test-api');
 
     module.exports = [
         api,
-        page
+        page,
+        testApi
     ]

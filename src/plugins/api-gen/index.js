@@ -11,8 +11,7 @@ let
 
 
 module.exports = (app) => {
-
-    return () => {
+    let generate = () => {
         let apis = app.$data;
         fse.removeSync("./dist/api-gen");
         let apiFiles = app.$env.apiFiles = apis.reduce((prev, item) => Object.assign(prev, {[item.name]: `./dist/api/${item.name}.js`}), {});
@@ -21,27 +20,31 @@ module.exports = (app) => {
             let
                 apiConfigs = item.value;
 
-                if (apiConfigs) {
-                    let itemResult = _.template(itemTemplate)({
-                        apis: apiConfigs,
-                        getParams: (item) => {
-                            if (item.method.toUpperCase() === 'GET' && item.params) {
-                                let results = item.params.map((item) => {
-                                    return `${item}=\$\{${item}\}`;
-                                });
-                                return `?${results.join('&')}`
-                            }
-                            return '';
+            if (apiConfigs) {
+                let itemResult = _.template(itemTemplate)({
+                    apis: apiConfigs,
+                    getParams: (item) => {
+                        if (item.method.toUpperCase() === 'GET' && item.params) {
+                            let results = item.params.map((item) => {
+                                return `${item}=\$\{${item}\}`;
+                            });
+                            return `?${results.join('&')}`
                         }
-                    });
+                        return '';
+                    }
+                });
 
-                    fse.outputFileSync(apiFiles[item.name], jsBeautify(itemResult, beautifyOps));
+                fse.outputFileSync(apiFiles[item.name], jsBeautify(itemResult, beautifyOps));
 
-                    app.$emit("api-gen-generated", apiConfigs);
-                }
+                app.$emit("api-gen-generated", apiConfigs);
+            }
         });
 
         app.$emit("apis-generated");
-    }
+    };
+
+    app.$on("test-api-completed",()=>{
+        generate();
+    });
 
 }
