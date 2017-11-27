@@ -21,9 +21,11 @@ module.exports = [
                     "id": "movieTheaters.subjects[0].id",
 //          从input表单中生成并使用正则(可以用来生成fromcheck)
 //          plugin 使用
-                    "other": {
+                    "name": {
                         type:'text',
-                        reg:''
+                        reg:'/\s+/g',
+                        //name:'',
+                        failMsg:'请输入正确的用户名!'
                     }
                 },
                 "page": "details"

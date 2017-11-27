@@ -1,6 +1,12 @@
 <template>
     <div class="<%= name %>-page">
-        <%= name %>-page
+        <% if(form.length>0){%>
+            <% form.forEach((item)=>{%>
+                <input class="<%= item.name %>" type="<%= item.type %>" v-model="<%= item.name %>">
+            <%}) %>
+        <%}else{%>
+            <%= name %>-page
+        <%} %>
     </div>
 </template>
 <script>
@@ -9,10 +15,34 @@
         name: '<%= name %>-page',
         data() {
             return {
+                <%= (form||[]).map((item)=>item.name).join(',\r\n')%>
             }
         },
         methods: {
-            <% apis&&apis.forEach((item)=>{%>
+            <% let forms = (form||[]).map((item)=>item.reg).filter((item)=>!!item);%>
+            <% if(forms.length>0){%>
+            formCheck(){
+                let error = '';
+                switch(true){
+                    <% form.forEach((item)=>{%>
+                        case !<%= item.reg %>.test(this.<%= item.name %>):
+                               error = '<%= item.failMsg %>';
+                            break;
+                    <%}) %>
+                }
+                if(error){
+                    this.$toast(error);
+                    return false;
+                }
+                return true;
+            },
+            submit(){
+                if(this.formCheck()){
+
+                }
+            },
+            <%} %>
+            <% (apis||[]).forEach((item)=>{%>
             <%= item.name %>(){
                 <% if(item.params){%>
                     let <%= item.params.join(',') %>;
