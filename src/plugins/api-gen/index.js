@@ -14,7 +14,7 @@ module.exports = (app) => {
 
     return () => {
         let apis = app.$data;
-        fse.removeSync("./dist/api");
+        fse.removeSync("./dist/api-gen");
         let apiFiles = app.$env.apiFiles = apis.reduce((prev, item) => Object.assign(prev, {[item.name]: `./dist/api/${item.name}.js`}), {});
 
         apis.forEach((item) => {
@@ -37,7 +37,7 @@ module.exports = (app) => {
 
                     fse.outputFileSync(apiFiles[item.name], jsBeautify(itemResult, beautifyOps));
 
-                    app.$emit("api-generated", apiConfigs);
+                    app.$emit("api-gen-generated", apiConfigs);
                 }
         });
 
