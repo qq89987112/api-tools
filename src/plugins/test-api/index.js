@@ -26,8 +26,20 @@ let
 
         switch (item.method.toUpperCase()) {
             case "GET":
+                let url = item.url;
+                if(_item.params){
+                    let func = `(function(){
+                    let ${Object.entries(_item.params).map((item)=>{
+                        return `${item[0]}=${''+item[1]}`
+                    }).join(',')};
+                    return eval("\`${item.url}\`");
+                })`;
+                    url = eval(func)();
+                }
+
+
                 temp = request
-                    .get(item.url, {
+                    .get(url, {
                         qs: _item.params
                     }, result);
                 break;
@@ -80,24 +92,51 @@ module.exports = (app) => {
                                 let
                                     item = entries[i],
                                     key = item[0],
-                                    value = item[1];
+                                    value = item[1],
+                                    getFromStore = (expression)=>{
+                                        try{
+                                            let varName = expression.split(".")[0];
+                                            return eval(`(function(${varName}){
+                                                         return eval('${expression}');
+                                                      })`)(appResults[varName])
+                                        }catch (e){
+                                            return '';
+                                        }
+
+                                    };
+
+
 
                                 if (typeof value === 'object') {
                                     //    从input框中获取
                                     //   直接随机数就是这么叼
-                                    _item.params[key] = "" + new Date().getTime();
+                                    switch (value.from){
+                                        case 'input':
+                                            _item.params[key] = "" + new Date().getTime();
+                                            break;
+                                        case 'route':
+                                            let result  = getFromStore(value.get);
+                                            if(result){
+                                                _item.params[key] = result;
+                                            }else{
+                                                return;
+                                            }
+                                            break;
+                                        default:
+                                            return;
+                                    }
+
 
                                 } else if (typeof value === 'string' && ~value.indexOf(".")) {
                                     //    从全局results中获取
-                                    let varName = value.split(".")[0];
-                                    try {
-                                        _item.params[key] = eval(`(function(${varName}){
-                                                         return eval('${value}');
-                                                      })`)(appResults[varName]);
-                                    } catch (e) {
-                                        // 拿不到就退出,等待下一次机会
-                                        return;
-                                    }
+
+                                     let result  = getFromStore(value);
+                                     if(result){
+                                         _item.params[key] = result;
+                                     }else{
+                                         return;
+                                     }
+
 
                                 }
                             }

@@ -1,5 +1,8 @@
+<% let fromRoutes = apis.paramsFrom; %>
+
 <template>
     <div class="<%= name %>-page">
+        <%= fromRoutes %>
         <% if(form.length>0){%>
             <% form.forEach((item)=>{%>
                 <input class="<%= item.name %>" type="<%= item.type %>" v-model="<%= item.name %>">
