@@ -12,6 +12,7 @@ module.exports = [
             },
             {
                 "name": "fetchSubject",
+                // 这里需要将${id}转为模版字符串,可以使用动态函数解决。
                 "url": "/subject/${id}",
                 "method": "get",
                 "params": [
