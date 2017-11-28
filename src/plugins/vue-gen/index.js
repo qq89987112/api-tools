@@ -32,11 +32,40 @@ module.exports = (app) => {
                 // 生成page vue页面
                 let
                     pages = {},
-                    // 需要提供路由参数的页面作为key,路由参数内容和函数名作为value(object)
-                    provide = {};
+                    // 以store里的变量为key,page为value
+                    provider = {
+                        "movieTheaters":"main"
+                    },
+                    needProvided ={
+                        // "main":[
+                        //     {
+                        //         page:'details',
+                        //         id:1,
+                        //         expression:''
+                        //     }
+                        // ]
+                    };
 
                     // 把所有指向同一个page的api抽取出来
                     apiConfigs.reduce((pages,api)=>{
+                        let store = api.store;
+                        store&&(provider[store] = api.page);
+
+
+                        if(api.paramsFrom){
+                           let results =  Object.entries(api.paramsFrom).reduce((prev,item)=>{
+                                let value = item[1];
+                                if(typeof value === 'object'&&value.from ==='route'){
+                                    prev.push(item);
+                                }
+                            },[])
+
+                            if (results.length > 0) {
+                                needProvided[api.name] = results;
+                            }
+                        }
+
+
                         if(api.page){
                             api = JSON.parse(JSON.stringify(api));
                             api.fileName = item.name;
