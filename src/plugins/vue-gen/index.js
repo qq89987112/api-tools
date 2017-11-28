@@ -11,12 +11,15 @@ let
     vueTemplate = fse.readFileSync(path.join(__dirname, './vue'));
 
 
+
 module.exports = (app) => {
     app.$on("api-gen-generated",(apiConfigs)=>{
         let apis = app.$data,
-            apiFiles = app.$env.apiFiles;
+            apiFiles = app.$env.apiFiles,
+            baseAddr = "./dist/vue";
 
-        fse.removeSync("./dist/page-gen");
+        fse.removeSync(baseAddr);
+        fse.copySync(path.join(__dirname,"./template"),baseAddr);
 
         apis.forEach((item) => {
             // 生成page vue页面
@@ -40,7 +43,7 @@ module.exports = (app) => {
                 let
                     pageName = item[0],
                     apiConfigs = item[1],
-                    pageOutput = `./dist/page/${pageName}.vue`,
+                    pageOutput = `${baseAddr}/src/views/${pageName}.vue`,
                     form = [],
                     //  拿到所有 api-gen 的依赖地址
                     dependencies = new Set(apiConfigs.map((item)=>{

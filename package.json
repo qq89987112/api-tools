@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"node entry/run"
+    "dev": "node entry/run",
+    "koa":"node dist/koa/main.js"
   },
   "repository": {
     "type": "git",
