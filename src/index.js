@@ -18,6 +18,7 @@ module.exports = (apis) => {
                         results,
                         params = [];
                     item.url = prefix + item.url;
+
                     while (results = parasReg.exec(item.url)) {
                         params.push(results[1]);
                     }
