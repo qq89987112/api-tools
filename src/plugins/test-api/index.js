@@ -9,7 +9,7 @@ let
                 states[item.url + _item.index] = "fail";
             } else {
                 _item.app.$env.appResults[item.store] = JSON.parse(body);
-                item.comment = body.slice(0, 200);
+                item.comment = body.slice(0, 400);
                 counter++;
                 if (counter === count) {
                     _item.app.$emit('test-api-completed');
