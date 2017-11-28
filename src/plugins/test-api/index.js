@@ -3,30 +3,32 @@ let
     async = require('async'),
     requests = async.queue((_item, done) => {
         let temp, item = _item.item;
+
         function result(error, response, body) {
-            if(error){
-                states[item.url+_item.index] = "fail";
-            }else{
+            if (error) {
+                states[item.url + _item.index] = "fail";
+            } else {
                 _item.app.$env.appResults[item.store] = JSON.parse(body);
-                item.comment = body.slice(0,200);
+                item.comment = body.slice(0, 200);
                 counter++;
                 if (counter === count) {
                     _item.app.$emit('test-api-completed');
-                    isEmited = true;
+                    isEmitted = true;
                 }
-                states[item.url+_item.index] = "success";
+                states[item.url + _item.index] = "success";
 
                 _item.app.$emit('api-result');
             }
 
             done();
         }
+
         switch (item.method.toUpperCase()) {
             case "GET":
                 temp = request
                     .get(item.url, {
                         qs: _item.params
-                    },result);
+                    }, result);
                 break;
             case "POST":
                 break;
@@ -35,10 +37,10 @@ let
     states = {},
     count = 0,
     counter = 0,
-    isEmited = false;
+    isEmitted = false;
 
-process.on('exit',()=>{
-    if(!isEmited){
+process.on('exit', () => {
+    if (!isEmitted) {
         console.log("程序即将结束但从未触发过'test-api-completed'事件");
     }
 })
@@ -52,9 +54,9 @@ module.exports = (app) => {
         fetch = () => {
             apis.forEach((api) => {
                 let apiConfigs = api.value;
-                apiConfigs.forEach((item,index) => {
+                apiConfigs.forEach((item, index) => {
                     //同一个url不同参数index肯定不一样
-                    let state = states[item.url+index];
+                    let state = states[item.url + index];
 
                     if (state !== "success" && state !== "doing") {
 
@@ -63,7 +65,7 @@ module.exports = (app) => {
                             _item = {
                                 item: item,
                                 app: app,
-                                index:index
+                                index: index
                             };
 
                         //先进行参数检查,无外部依赖或者参数获取不报错的进入请求。
@@ -100,7 +102,7 @@ module.exports = (app) => {
                             }
                         }
 
-                        states[item.url+index] = "doing";
+                        states[item.url + index] = "doing";
                         requests.push(_item);
                     }
 

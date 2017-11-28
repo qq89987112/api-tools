@@ -4,28 +4,28 @@ let
     app = new events.EventEmitter(),
     plugins = require("./plugins/index");
 
-module.exports = (apis)=>{
-    apis.forEach((item)=>{
+module.exports = (apis) => {
+    apis.forEach((item) => {
         let
-            prefix = item.prefix||"",
+            prefix = item.prefix || "",
             apiConfig = item.value;
 
-            if(prefix){
-                apiConfig.forEach((item)=>{
-                    if(item.url){
-                        let
-                            parasReg = /\$\{(.+)\}/g,
-                            results,
-                            params = [];
-                        item.url = prefix+item.url;
-                        while(results = parasReg.exec(item.url)){
-                            params.push(results[1]);
-                        }
-
-                        item.params2 = params;
+        if (prefix) {
+            apiConfig.forEach((item) => {
+                if (item.url) {
+                    let
+                        parasReg = /\$\{(.+)\}/g,
+                        results,
+                        params = [];
+                    item.url = prefix + item.url;
+                    while (results = parasReg.exec(item.url)) {
+                        params.push(results[1]);
                     }
-                });
-            }
+
+                    item.params2 = params;
+                }
+            });
+        }
 
     });
     app.$data = apis;
@@ -33,9 +33,9 @@ module.exports = (apis)=>{
     app.$env = {};
     app.$emit = app.emit;
     app.$on = app.on;
-    plugins = plugins.map((item)=>item(app));
-    plugins.forEach((item)=>{
-        if(item instanceof Function){
+    plugins = plugins.map((item) => item(app));
+    plugins.forEach((item) => {
+        if (item instanceof Function) {
             item();
         }
     })
