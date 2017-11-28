@@ -26,7 +26,7 @@ module.exports = [
                     },
 //          从input表单中生成并使用正则(可以用来生成fromcheck)
 //          plugin 使用
-                    "name": {
+                    "title": {
                         from:'input',
                         type:'text',
                         reg:'/\s+/g',
@@ -34,7 +34,7 @@ module.exports = [
                         failMsg:'请输入正确的用户名!'
                     }
                 },
-                "page": "details"
+                "page": "main"
             }
         ]
     }

@@ -1,15 +1,22 @@
-<% let fromRoutes = apis.paramsFrom; %>
+<% let
+        stores = {},
+        paramsFrom = apis.reduce((prev,apiConfig)=>{
+             if(apiConfig.store){
+                  stores[apiConfig.name] = apiConfig.store;
+             }
+            return prev.concat(Object.entries(apiConfig.paramsFrom||{}).reduce((prev,item)=>{
+                return prev.concat(Object.assign({},{name:item[0]},item[1]));
+            },[]))
+        },[]),
+        fromRoute = paramsFrom.filter((item)=>item.from==='route'),
+        fromInput = paramsFrom.filter((item)=>item.from==='input');
+ %>
 
 <template>
     <div class="<%= name %>-page">
-        <%= fromRoutes %>
-        <% if(form.length>0){%>
-            <% form.forEach((item)=>{%>
-                <input class="<%= item.name %>" type="<%= item.type %>" v-model="<%= item.name %>">
-            <%}) %>
-        <%}else{%>
-            <%= name %>-page
-        <%} %>
+      <%= (fromInput||[]).
+        map((item)=>`<input class="${item.name}" type="${item.type}" v-model="${item.name}">`)
+        .concat(form.length==0&&`${name}-page`||[]).join('\r\n') %>
     </div>
 </template>
 <script>
@@ -17,17 +24,22 @@
     export default {
         name: '<%= name %>-page',
         data() {
+            <%=
+                fromRoute.map((item)=>{
+                   return `this.${item.name} = this.$route.params.${item.name}`;
+                }).concat(Object.entries(stores).map((item)=>`this.${item[1]}=''`)).join(';\r\n')
+            %>
             return {
-                <%= (form||[]).map((item)=>item.name).join(',\r\n')%>
+                <%= (fromInput||[]).map((item)=>item.name).map((item)=>`${item}:''`).join(',\r\n')%>
             }
         },
         methods: {
-            <% let forms = (form||[]).map((item)=>item.reg).filter((item)=>!!item);%>
+            <% let forms = (fromInput||[]).map((item)=>item.reg).filter((item)=>!!item);%>
             <% if(forms.length>0){%>
             formCheck(){
                 let error = '';
                 switch(true){
-                    <% form.forEach((item)=>{%>
+                    <% fromInput.forEach((item)=>{%>
                         case !<%= item.reg %>.test(this.<%= item.name %>):
                                error = '<%= item.failMsg %>';
                             break;
@@ -45,14 +57,20 @@
                 }
             },
             <%} %>
-            <% (apis||[]).forEach((item)=>{%>
-            <%= item.name %>(){
-                <% if(item.params){%>
-                    let <%= item.params.join(',') %>;
+            <% (apis||[]).forEach((apiConfig)=>{%>
+            <%= apiConfig.name %>(){
+                <% if(apiConfig.params){%>
+                    let
+                        <%= apiConfig._paramsAll.map((item)=>`${item} = this.${item}`).join(',') %>;
                 <%} %>
-                    <%= item.fileName %>.<%= item.name %>(<%= item.params&&item.params.join(',') %>).then((data)=>{
-
-                    })
+                        <%= apiConfig.fileName %>.<%= apiConfig.name %>(<%= (apiConfig._paramsAll||[]).join(',') %>).then((data)=>{
+                            <%
+                                let store = stores[apiConfig.name];
+                                if(store){%>
+                                    this.<%= store %> = data;
+                                <%}
+                            %>
+                        })
             },
             <%}) %>
         },

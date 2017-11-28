@@ -66,7 +66,7 @@ module.exports = (app) => {
                     return matched.replace(extract, `\r\n${jsBeautify(extract,beautifyOps)}\r\n`);
                 }).replace(/<template>([\s\S]+)<\/template>/,(matched,extract,index,all)=>{
                     return matched.replace(extract, `\r\n${htmlBeautify(extract,Object.assign({},beautifyOps,{max_preserve_newlines:0}))}\r\n`);
-                }));
+                }).replace(/^\s+/,''));
             });
         });
     })

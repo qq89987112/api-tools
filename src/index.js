@@ -23,6 +23,7 @@ module.exports = (apis) => {
                     }
 
                     item.params2 = params;
+                    item._paramsAll =(item.params2||[]).concat(item.params||[]);
                 }
             });
         }
