@@ -29,7 +29,7 @@ module.exports = [
                     "title": {
                         from:'input',
                         type:'text',
-                        reg:'/\s+/g',
+                        reg:`/\\s+/g`,
                         //name:'',
                         failMsg:'请输入正确的用户名!'
                     }

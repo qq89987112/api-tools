@@ -9,8 +9,13 @@ let
             if (error) {
                 states[item.url + _item.index] = "fail";
             } else {
-                _item.app.$env.appResults[item.store] = JSON.parse(body);
-                item.comment = jsBeautify(body).replace(/(.+)/g,"//$1");
+                if(item.store){
+                    _item.app.$env.appResults[item.store] = JSON.parse(body);
+                }
+                let comment = jsBeautify(body).replace(/(.+)/g,"//$1");
+                let addon = comment.length>1200?'\r\n//详情查看cache.json':'';
+                item.comment = comment.slice(0,1200)+addon;
+
                 counter++;
                 if (counter === count) {
                     _item.app.$emit('test-api-completed');

@@ -16,7 +16,7 @@
     <div class="<%= name %>-page">
       <%= (fromInput||[]).
         map((item)=>`<input class="${item.name}" type="${item.type}" v-model="${item.name}">`)
-        .concat(form.length==0&&`${name}-page`||[]).join('\r\n') %>
+        .concat(fromInput.length==0&&`${name}-page`||[]).join('\r\n') %>
     </div>
 </template>
 <script>
