@@ -34,7 +34,7 @@ module.exports = [
                         failMsg:'请输入正确的用户名!'
                     }
                 },
-                "page": "main"
+                "page": "details"
             }
         ]
     }
