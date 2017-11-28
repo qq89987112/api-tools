@@ -1,6 +1,7 @@
 let
     request = require('request'),
     async = require('async'),
+    jsBeautify = require('js-beautify').js,
     requests = async.queue((_item, done) => {
         let temp, item = _item.item;
 
@@ -9,7 +10,7 @@ let
                 states[item.url + _item.index] = "fail";
             } else {
                 _item.app.$env.appResults[item.store] = JSON.parse(body);
-                item.comment = body.slice(0, 400);
+                item.comment = jsBeautify(body).replace(/(.+)/g,"//$1");
                 counter++;
                 if (counter === count) {
                     _item.app.$emit('test-api-completed');
