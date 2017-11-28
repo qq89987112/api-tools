@@ -17,11 +17,16 @@ module.exports = [
                 "params": [
                     "title"
                 ],
+                // 分别有对象和字符串写法。对象写法信息更多提供给ui生成，字符串写法主要给test-api
                 "paramsFrom": {
-                    "id": "movieTheaters.subjects[0].id",
+                    "id": {
+                        from:'route',
+                        get:"movieTheaters.subjects[0].id"
+                    },
 //          从input表单中生成并使用正则(可以用来生成fromcheck)
 //          plugin 使用
                     "name": {
+                        from:'input',
                         type:'text',
                         reg:'/\s+/g',
                         //name:'',
