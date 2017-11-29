@@ -1,10 +1,14 @@
 let
+    koa = require('./koa-gen'),
     api = require('./api-gen'),
-    page = require('./page-gen'),
-    testApi = require('./test-api');
+    page = require('./vue-gen'),
+    testApi = require('./test-api'),
+    apiCache = require('./api-cache');
 
     module.exports = [
+        koa,
         api,
         page,
-        testApi
+        testApi,
+        apiCache
     ]

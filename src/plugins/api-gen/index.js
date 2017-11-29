@@ -12,9 +12,10 @@ let
 
 module.exports = (app) => {
     let generate = () => {
-        let apis = app.$data;
-        fse.removeSync("./dist/api-gen");
-        let apiFiles = app.$env.apiFiles = apis.reduce((prev, item) => Object.assign(prev, {[item.name]: `./dist/api/${item.name}.js`}), {});
+        let apis = app.$data,
+            baseAddr = "./dist/api";
+        fse.removeSync(baseAddr);
+        let apiFiles = app.$env.apiFiles = apis.reduce((prev, item) => Object.assign(prev, {[item.name]: `${baseAddr}/${item.name}.js`}), {});
 
         apis.forEach((item) => {
             let

@@ -1,32 +1,52 @@
 let
     request = require('request'),
     async = require('async'),
+    jsBeautify = require('js-beautify').js,
     requests = async.queue((_item, done) => {
         let temp, item = _item.item;
+
         function result(error, response, body) {
-            if(error){
-                states[item.url+_item.index] = "fail";
-            }else{
-                _item.app.$env.appResults[item.store] = JSON.parse(body);
-                item.comment = body.slice(0,200);
+            if (error) {
+                states[item.url + _item.index] = "fail";
+            } else {
+                if(item.store){
+                    _item.app.$env.appResults[item.store] = JSON.parse(body);
+                }
+                let comment = jsBeautify(body).replace(/(.+)/g,"//$1");
+                let addon = comment.length>1200?'\r\n//详情查看cache.json':'';
+                item.comment = comment.slice(0,1200)+addon;
+
                 counter++;
                 if (counter === count) {
                     _item.app.$emit('test-api-completed');
-                    isEmited = true;
+                    isEmitted = true;
                 }
-                states[item.url+_item.index] = "success";
+                states[item.url + _item.index] = "success";
 
                 _item.app.$emit('api-result');
             }
 
             done();
         }
+
         switch (item.method.toUpperCase()) {
             case "GET":
+                let url = item.url;
+                if(_item.params){
+                    let func = `(function(){
+                    let ${Object.entries(_item.params).map((item)=>{
+                        return `${item[0]}=${''+item[1]}`
+                    }).join(',')};
+                    return eval("\`${item.url}\`");
+                })`;
+                    url = eval(func)();
+                }
+
+
                 temp = request
-                    .get(item.url, {
+                    .get(url, {
                         qs: _item.params
-                    },result);
+                    }, result);
                 break;
             case "POST":
                 break;
@@ -35,10 +55,10 @@ let
     states = {},
     count = 0,
     counter = 0,
-    isEmited = false;
+    isEmitted = false;
 
-process.on('exit',()=>{
-    if(!isEmited){
+process.on('exit', () => {
+    if (!isEmitted) {
         console.log("程序即将结束但从未触发过'test-api-completed'事件");
     }
 })
@@ -52,9 +72,9 @@ module.exports = (app) => {
         fetch = () => {
             apis.forEach((api) => {
                 let apiConfigs = api.value;
-                apiConfigs.forEach((item,index) => {
+                apiConfigs.forEach((item, index) => {
                     //同一个url不同参数index肯定不一样
-                    let state = states[item.url+index];
+                    let state = states[item.url + index];
 
                     if (state !== "success" && state !== "doing") {
 
@@ -63,7 +83,7 @@ module.exports = (app) => {
                             _item = {
                                 item: item,
                                 app: app,
-                                index:index
+                                index: index
                             };
 
                         //先进行参数检查,无外部依赖或者参数获取不报错的进入请求。
@@ -77,30 +97,57 @@ module.exports = (app) => {
                                 let
                                     item = entries[i],
                                     key = item[0],
-                                    value = item[1];
+                                    value = item[1],
+                                    getFromStore = (expression)=>{
+                                        try{
+                                            let varName = expression.split(".")[0];
+                                            return eval(`(function(${varName}){
+                                                         return eval('${expression}');
+                                                      })`)(appResults[varName])
+                                        }catch (e){
+                                            return '';
+                                        }
+
+                                    };
+
+
 
                                 if (typeof value === 'object') {
                                     //    从input框中获取
                                     //   直接随机数就是这么叼
-                                    _item.params[key] = "" + new Date().getTime();
+                                    switch (value.from){
+                                        case 'input':
+                                            _item.params[key] = "" + new Date().getTime();
+                                            break;
+                                        case 'route':
+                                            let result  = getFromStore(value.get);
+                                            if(result){
+                                                _item.params[key] = result;
+                                            }else{
+                                                return;
+                                            }
+                                            break;
+                                        default:
+                                            return;
+                                    }
+
 
                                 } else if (typeof value === 'string' && ~value.indexOf(".")) {
                                     //    从全局results中获取
-                                    let varName = value.split(".")[0];
-                                    try {
-                                        _item.params[key] = eval(`(function(${varName}){
-                                                         return eval('${value}');
-                                                      })`)(appResults[varName]);
-                                    } catch (e) {
-                                        // 拿不到就退出,等待下一次机会
-                                        return;
-                                    }
+
+                                     let result  = getFromStore(value);
+                                     if(result){
+                                         _item.params[key] = result;
+                                     }else{
+                                         return;
+                                     }
+
 
                                 }
                             }
                         }
 
-                        states[item.url+index] = "doing";
+                        states[item.url + index] = "doing";
                         requests.push(_item);
                     }
 
