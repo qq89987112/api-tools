@@ -1,0 +1,2 @@
+1、api的返回值不仅可以作注释，用作IDE的智能提示也美滋滋
+2、https://github.com/adrai/flowchart.js使用这个语法来设计页面跳转

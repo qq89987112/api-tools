@@ -19,7 +19,7 @@ module.exports = [
                     "title"
                 ],
                 // 分别有对象和字符串写法。对象写法信息更多提供给ui生成，字符串写法主要给test-api
-                // api的返回值不仅可以作注释，用作IDE的智能提示也美滋滋
+
                 "paramsFrom": {
                     "id": {
                         from:'route',
