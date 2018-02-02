@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "electron ."
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node entry",
+    "koa":"node dist/koa/main.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +19,11 @@
   },
   "homepage": "https://github.com/qq89987112/api-tools#readme",
   "dependencies": {
-    "electron": "^1.7.12"
+    "async": "^2.6.0",
+    "fs-extra": "^4.0.2",
+    "js-beautify": "^1.7.4",
+    "lodash": "^4.17.4",
+    "request": "^2.83.0"
   },
   "devDependencies": {}
 }
