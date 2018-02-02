@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {Upload} from "antd"
+import 'antd'
+import 'antd/dist/antd.css';
 
 class App extends Component {
+  beforeUpload(file){
+    let fr = new FileReader();
+    fr.readAsText(file);
+    fr.onload = function() {
+        console.log(this.result);
+        debugger
+    }
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+        <Upload.Dragger beforeUpload={this.beforeUpload}>
+          小伙子
+        </Upload.Dragger>
     );
   }
 }
