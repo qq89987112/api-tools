@@ -1,23 +1,16 @@
 {
-  "name": "api-tools",
-  "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/qq89987112/api-tools.git"
-  },
-  "author": "蔡荣庚",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/qq89987112/api-tools/issues"
-  },
-  "homepage": "https://github.com/qq89987112/api-tools#readme",
+  "name": "init",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "electron": "^1.7.12"
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-scripts": "1.1.0"
   },
-  "devDependencies": {}
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
 }
