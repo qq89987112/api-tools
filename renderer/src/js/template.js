@@ -29,5 +29,9 @@ export default class Template {
         return this.xmlTemplate.$;
     }
 
+    getContent(){
+        return this.xmlTemplate._;
+    }
+
 
 }

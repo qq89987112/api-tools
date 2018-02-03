@@ -1,25 +1,47 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+import {Table,Button} from 'antd'
 import 'antd/dist/antd.css';
-import {Upload} from "antd"
-import Template from "../../js/template";
+import BaseComponent from "../../components/Base/BaseComponent";
 import ModalWrapper from "../../components/Base/ModalWrapper";
+import TemplateUpload from "../../components/TemplateUpload";
+import TemplateGenerator from "../api-driver/components/JSTemplateGenerator";
 
+export default class Generator extends BaseComponent {
 
-export default class TemplateDriver extends Component {
-
-    onFileSelect(file) {
-        Template.load(file).then(template => {
-            ModalWrapper.$show(() => <p>{JSON.stringify(template.getParameter())}</p>)
-        })
+    componentWillMount() {
+        this.dataSource = JSON.parse(localStorage.templates||'[]');
+        this.$setInputValue('type','post')
+        this.$setInputValue('protocol','http://')
     }
 
-    onInput(key){
-
-    }
 
     render() {
         return (
-            <Upload.Dragger showUploadList={false} customRequest={e => this.onFileSelect(e.file)}><p>小伙子</p></Upload.Dragger>
+            <Table
+                title={()=><TemplateUpload  onTemplate={template=>ModalWrapper.$show(<TemplateGenerator template={template}/>)} />}
+                dataSource={this.dataSource}
+                columns={[
+                    {
+                        title: '名字',
+                        dataIndex: 'url'
+                    },
+                    {
+                        title: '内容',
+                        dataIndex: 'method'
+                    },
+                    {
+                        title: '使用记录',
+                        dataIndex: 'params'
+                    },
+                    {
+                        title: '编辑',
+                        dataIndex: 'result'
+                    }
+                ]}
+            />
         );
     }
+
+
+
 };

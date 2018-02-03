@@ -1,15 +1,13 @@
 import React, {Component} from 'react';
-import {Upload, Select} from "antd"
+import {Select} from "antd"
 import 'antd/dist/antd.css';
-import Template from "../js/template";
-import ModalWrapper from "../components/Base/ModalWrapper";
-import ApiManager from "./api-driver/ApiManager";
+import ApiManager from "./api-driver/ApiDriver";
 import TemplateDriver from "./template-driver/TemplateDriver";
 
 
 class App extends Component {
     state = {
-        type:'template-driver'
+        type:'api-driver'
     }
 
 
@@ -18,9 +16,9 @@ class App extends Component {
         return (
             <div>
                 <div className='tar'>
-                    <Select style={{ width: 120 }} defaultValue='template-driver' onChange={v=>this.setState({type:v})}>
-                        <Select.Option value='template-driver'>模板驱动</Select.Option>
+                    <Select style={{ width: 120 }} defaultValue='api-driver' onChange={v=>this.setState({type:v})}>
                         <Select.Option value='api-driver'>API驱动</Select.Option>
+                        <Select.Option value='template-driver'>模板驱动</Select.Option>
                     </Select>
                 </div>
                 {
