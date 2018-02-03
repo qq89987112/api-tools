@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import {Upload, Select} from "antd"
 import 'antd/dist/antd.css';
-import Template from "./js/template";
-import ModalWrapper from "./components/Base/ModalWrapper";
-import ApiManager from "./components/ApiManager/ApiManager";
+import Template from "../js/template";
+import ModalWrapper from "../components/Base/ModalWrapper";
+import ApiManager from "./api-driver/ApiManager";
+import TemplateDriver from "./template-driver/TemplateDriver";
 
 
 class App extends Component {
@@ -11,11 +12,6 @@ class App extends Component {
         type:'template-driver'
     }
 
-    onFileSelect(file) {
-        Template.load(file).then(template => {
-            ModalWrapper.$show(() => <p>{JSON.stringify(template.getParameter())}</p>)
-        })
-    }
 
     render() {
         const {type} = this.state;
@@ -28,7 +24,7 @@ class App extends Component {
                     </Select>
                 </div>
                 {
-                    (type==='template-driver'&&<Upload.Dragger showUploadList={false} customRequest={e => this.onFileSelect(e.file)}><p>小伙子</p></Upload.Dragger>) ||
+                    (type==='template-driver'&&<TemplateDriver/>) ||
                     (type ==='api-driver'&&<ApiManager/>)
                 }
 
