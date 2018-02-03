@@ -1,15 +1,14 @@
 function a() {
     return {
-        parameters:[
+        parameters:
             {
-                className:String,
-                fields:Array,
-                fieldValids:Array,
-                labels:Array
-            }
-        ],
-        compile(params){
-            const {fields,className,fieldValids,labels} = params;
+                className: String,
+                fields: Array,
+                fieldValids: Array,
+                labels: Array
+            },
+        compile(params) {
+            const {fields, className, fieldValids, labels} = params;
             return `
                                 import {Form,Input,Button,DatePicker,Switch} from "antd";
                                 import React from "react";
@@ -18,11 +17,11 @@ function a() {
                                 
                                 export default class ${className} extends BaseComponent {
                                 
-                                    componentDidMount(){
-                                        const {${className.toLowerCase()}={}} = this.props;
+                                    componentWillMount(){
+                                        const {${className}={}} = this.props;
                                         ${
-                                            fields.map(i=>`this.$setInputValue('${i}',${className.toLowerCase()}.${i})`).join("\r\n")
-                                        }
+                fields.map(i => `this.$setInputValue('${i}',${className}.${i})`).join("\r\n")
+                }
                                     }
                                 
                                     render(){
@@ -31,17 +30,17 @@ function a() {
                                         return  <Form onSubmit={e=>{
                                             e.preventDefault();
                                             if (!this.$formCheck(
-                                                    ${fields.map((i,index)=>`['${i}',v=>v,'${fieldValids[index]}'],`)}
+                                                    ${fields.map((i, index) => `['${i}',v=>v,'${fieldValids[index]}'],`)}
                                                 )) {
                                                 this.$load('submit');
-                                                onSubmit&&onSubmit(Object.assign(this.$getInputValue([${fields.map(i=>`'${i}',`)}]))).then(()=>{
+                                                onSubmit&&onSubmit(this.$getInputValue([${fields.map(i => `'${i}',`)}])).then(()=>{
                                                     this.$cancel('submit')
                                                 });
                                             }
                                         }}>
                                         ${
-                                            labels.map((i,index)=>`<Form.Item {...FormUtils.formItemLayout(1)} label='${i}'><Input defaultValue={${className.toLowerCase()}.${fields[index]} onInput={this.$onInput('${fields[index]}')}/></Form.Item>`)
-                                        }
+                labels.map((i, index) => `<Form.Item {...FormUtils.formItemLayout(1)} label='${i}'><Input defaultValue={this.$getInputValue('${fields[index]}')} onInput={this.$onInput('${fields[index]}')}/></Form.Item>`)
+                }
                                             <Form.Item className='tac'><Button loading={this.$isLoading('submit')} htmlType='submit' type='primary'>保存</Button></Form.Item>
                                         </Form>;
                                     }

@@ -213,6 +213,15 @@ class BaseComponent extends React.Component {
     }
 
 
+    toast(content){
+        message.success(content);
+    }
+
+    toastError(error){
+        message.success(error);
+    }
+
+    
     // loading相关
     $load = (name) => {
         let

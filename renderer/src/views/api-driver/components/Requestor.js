@@ -1,17 +1,21 @@
 import React from 'react';
-import {Form, Input, Button, Select} from 'antd'
+import {Form, Input, Button, Select,Radio} from 'antd'
 import BaseComponent from "../../../components/Base/BaseComponent";
 import FormUtils from "../../../js/ant/FormUtils";
 import axios from "axios"
 import QuickPropover from "./QuickPropover";
+import preference from "../../../js/preference";
 
 export default class Requestor extends BaseComponent {
+    componentWillMount(){
+        this.$setInputValue('type','post')
+        this.$setInputValue('protocol','http://')
+    }
 
     render() {
-        let { onResult,...rest} = this.props;
-
+        let { onResult,triggerText='新增',...rest} = this.props;
         return (
-            <QuickPropover {...rest} content={<Form onSubmit={e => {
+            <QuickPropover {...rest} triggerText={triggerText} content={<Form onSubmit={e => {
                 e.preventDefault();
                 if (!this.$formCheck(
                         ['url', v => v, '请输入url地址！']
@@ -19,7 +23,8 @@ export default class Requestor extends BaseComponent {
 
                     let
                         form = this.$getInputValue(['protocol', 'url', 'type']),
-                        url = form.protocol + form.url,
+                        baseURL = preference.getSetting('baseURL'),
+                        url = baseURL ? baseURL + form.url : form.protocol + form.url,
                         parameter = this.state.parameter,
                         promise = Promise.resolve();
                     this.$load('submit');
@@ -34,7 +39,12 @@ export default class Requestor extends BaseComponent {
                     }
                     // 写一个全局配置，来管理成功和失败的条件。
                     promise.then(data => {
-                        onResult && onResult(data);
+                        this.$cancel('submit');
+                        onResult && onResult({
+                            url,
+                            data:data.data,
+                            params:parameter
+                        });
                     }).catch(() => {
 
                     })
@@ -50,10 +60,10 @@ export default class Requestor extends BaseComponent {
                         onInput={this.$onInput('url')}/>
                 </Form.Item>
                 <Form.Item label='方式' {...FormUtils.formItemLayout(1)}>
-                    <Select defaultValue={this.$getInputValue('type')} onChange={v => this.$setInputValue('type', v)}>
-                        <Select.Option value='post'>POST</Select.Option>
-                        <Select.Option value='get'>GET</Select.Option>
-                    </Select>
+                    <Radio.Group onChange={e => this.$setInputValue('type', e.target.value)} defaultValue={this.$getInputValue('type')}>
+                        <Radio.Button value="post">POST</Radio.Button>
+                        <Radio.Button value="get">GET</Radio.Button>
+                    </Radio.Group>
                 </Form.Item>
                 {
                     Object.entries(this.state.parameter || {}).map(i => <Form.Item {...FormUtils.formItemLayout(1)}

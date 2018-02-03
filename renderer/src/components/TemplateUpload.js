@@ -17,7 +17,7 @@ export default class TemplateUpload extends Component {
     }
     render() {
         return (
-            <Upload.Dragger showUploadList={false} customRequest={e => this.onFileSelect(e.file)}><p>小伙子</p></Upload.Dragger>
+            <Upload.Dragger showUploadList={false} customRequest={e => this.onFileSelect(e.file)}><p style={{lineHeight:"2em"}}>小伙子</p></Upload.Dragger>
         );
     }
 };

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Form,Input} from 'antd'
+import {Form,Input,Button,message} from 'antd'
 import 'antd/dist/antd.css';
 import BaseComponent from "../../../components/Base/BaseComponent";
 import Requestor from "./Requestor";
@@ -8,11 +8,17 @@ import Requestor from "./Requestor";
 export default class JSTemplateGenerator extends BaseComponent {
 
     render() {
-        const {parameter = {},onSubmit} = this.props;
-        const fields = Object.entries(parameter).filter(item=>!~item.indexOf('-type')).reduce((prev,cur)=>{
-            prev[cur[0]] = parameter[`${cur[0]}-type`];
-            return prev;
-        },{})
+        let {template,onSubmit} = this.props,
+            parameters = {};
+        try{
+            template = eval(`(${template})`)();
+            parameters = template.parameters;
+        }catch(e){
+            console.error(e);
+            return <div/>
+        }
+        let parametersKey = Object.keys(parameters);
+
         return (
             <div>
                 <p className='tar'><Requestor onResult={res=>{
@@ -20,19 +26,54 @@ export default class JSTemplateGenerator extends BaseComponent {
                 }}/></p>
                 <Form layout='inline' onSubmit={e=>{
                     e.preventDefault();
-                    onSubmit&&onSubmit(this.$getInputValue( Object.entries(fields).map(i=>i[0])));
+
+                    let form = this.$getInputValue(parametersKey);
+                    form = parametersKey.reduce((prev,cur,index)=>{
+                        let
+                            type = Object.prototype.toString.call(new parameters[cur]),
+                            value = form[cur]||"";
+                        switch (type){
+                            case "[object Array]":
+                                value = value ?value.replace(/，/,",").split(",") : [];
+                                break;
+                            case "[object String]":
+                                value = value ||"";
+                                break;
+                            case "[object Number]":
+                                value = value ? +value : undefined;
+                                break;
+                            case "[object Object]":
+                                try{
+                                    value = value ? JSON.parse(value) : {};
+                                }catch (e){
+                                    value = {};
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        prev[cur] = value;
+                        return prev;
+                    },{})
+                    try{
+                        onSubmit&&onSubmit(template.compile(form));
+                    }catch (e){
+                        message.error("编译出错！");
+                        // 在此处，进行控制台调试
+                        console.error(form);
+                    }
+
                 }}>
                     {
-                        Object.entries(fields).map(item=>{
-                            const type = (item[1]||"").toLowerCase();
-                            return <Form.Item label={item[0]}>
+                        parametersKey.map((item,i)=>{
+                            return <Form.Item key={i} label={item}>
                                 {
-                                    type ==='string'&&<Input onInput={this.$onInput(item[0])}/>
+                                    <Input onInput={this.$onInput(item)}/>
                                 }
                             </Form.Item>
                         })
                     }
-
+                    <Form.Item><Button htmlType='submit' type='primary'>确定</Button></Form.Item>
                 </Form>
             </div>
 
