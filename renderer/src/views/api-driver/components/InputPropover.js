@@ -3,7 +3,7 @@ import {Popover,Form,Input,Button,Select} from 'antd'
 import BaseComponent from "../../../components/Base/BaseComponent";
 
 
-export default class QuickPropover extends BaseComponent {
+export default class InputPropover extends BaseComponent {
 
     render() {
         let { onSubmit,title,triggerText } = this.props;

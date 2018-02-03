@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 
 const TreeNode = Tree.TreeNode;
 
-
+// 左键名字，右键路径。
 export default class JSONResult extends Component {
 
 
@@ -27,10 +27,23 @@ export default class JSONResult extends Component {
         return <TreeNode title={title} key={path}>{content}</TreeNode>
     }
 
+    onSelect = (selectedKeys,e)=>{
+        const {onLeftClick = ()=>{}} = this.props;
+        onLeftClick(e.node.props.title.split(":")[0]);
+    }
+
+    onRightClick = (e)=>{
+        const {onRightClick = ()=>{}} = this.props;
+        onRightClick(e.node.props.eventKey);
+    }
+
     render() {
         const {json = {},name="data"} = this.props;
         return (
-            <Tree>
+            <Tree
+                onSelect={this.onSelect}
+                onRightClick={this.onRightClick}
+            >
                 {Object.entries(json).map(item => this.loop(name,item[0],item[1]))}
             </Tree>
         );

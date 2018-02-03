@@ -4,8 +4,9 @@ import 'antd/dist/antd.css';
 import BaseComponent from "../../components/Base/BaseComponent";
 import ModalWrapper from "../../components/Base/ModalWrapper";
 import TemplateUpload from "../../components/TemplateUpload";
-import JSTemplateGenerator from "../api-driver/components/JSTemplateGenerator";
-import UITemplateGenerator from "../api-driver/components/UITemplateGenerator";
+import JSTemplateGenerator from "./components/JSTemplateGenerator";
+import UITemplateGenerator from "./components/UITemplateGenerator";
+import Requestor from "../api-driver/components/Requestor";
 
 export default class Generator extends BaseComponent {
 
@@ -32,20 +33,9 @@ export default class Generator extends BaseComponent {
             }
             } template={template}/>)} />;
 
-        const UITemplate = <TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=><UITemplateGenerator onSubmit={result=>{
-            // console.log(jsBeautify(htmlBeautify(result)))
-            // this.toast("已复制到剪贴板。");
-            console.log(result);
-            let value = this.dataSource;
-            value.push({content:result})
-            this.setState({
-                dataSource:value
-            })
-            //暂时注释
-            // localStorage.templates = JSON.stringify(value)
-            instance.close();
-        }
-        } template={template}/>)} />;
+        const UITemplate = <TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=><div>
+            <UITemplateGenerator template={template}/>
+        </div>,{width:'80%'})} />;
         return (
             <Table
                 title={()=><div>
