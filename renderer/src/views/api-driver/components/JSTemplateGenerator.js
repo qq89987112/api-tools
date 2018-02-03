@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Form,Input} from 'antd'
 import 'antd/dist/antd.css';
 import BaseComponent from "../../../components/Base/BaseComponent";
+import Requestor from "./Requestor";
 
 
 export default class JSTemplateGenerator extends BaseComponent {
@@ -14,6 +15,9 @@ export default class JSTemplateGenerator extends BaseComponent {
         },{})
         return (
             <div>
+                <p className='tar'><Requestor onResult={res=>{
+                    debugger
+                }}/></p>
                 <Form layout='inline' onSubmit={e=>{
                     e.preventDefault();
                     onSubmit&&onSubmit(this.$getInputValue( Object.entries(fields).map(i=>i[0])));
