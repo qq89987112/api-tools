@@ -1,6 +1,6 @@
 import React from 'react';
 import {Popover,Form,Input,Button,Select} from 'antd'
-import BaseComponent from "./BaseComponent";
+import BaseComponent from "./Base/BaseComponent";
 
 
 export default class QuickPropover extends BaseComponent {
@@ -12,7 +12,7 @@ export default class QuickPropover extends BaseComponent {
             <Popover placement="top"  onVisibleChange={v=> this.setState({popover:v})} visible={this.state.popover} title={title} content={
                 <Form layout='inline' onSubmit={e => {
                     e.preventDefault();
-                    this.$load('submit');
+                    e.stopPropagation();
                     let
                         form = this.$getInputValue(['name','value']),
                         type = form.type;
@@ -31,11 +31,9 @@ export default class QuickPropover extends BaseComponent {
                             break;
                     }
 
-                    onSubmit&&onSubmit(form).then(()=>{
-                        this.$cancel('submit');
-                        this.setState({
-                            popover:false
-                        })
+                    onSubmit&&onSubmit(form)
+                    this.setState({
+                        popover:false
                     })
                 }
                 }>
