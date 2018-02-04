@@ -21,9 +21,11 @@ export default class Generator extends BaseComponent {
             // console.log(jsBeautify(htmlBeautify(result)))
             // this.toast("已复制到剪贴板。");
             console.log(result.result);
-            result.params.url = result.url;
             let value = this.state.dataSource;
-            value.push(result)
+            value.push({
+                url:result.url,
+                params:result.params
+            })
             this.setDataSource(value);
             instance.close();
         }
@@ -59,20 +61,6 @@ export default class Generator extends BaseComponent {
                     {
                         title: 'url',
                         dataIndex: 'url'
-                    },
-                    {
-                        title: 'params',
-                        dataIndex: 'params'
-                    },
-                    {
-                        title: 'result',
-                        dataIndex: 'result',
-                        render: (text) => text.slice(0,10)
-                    },
-                    {
-                        title: 'template',
-                        dataIndex: 'template',
-                        render: (text) => text.slice(0,10)
                     },
                     {
                         title: 'operation',
