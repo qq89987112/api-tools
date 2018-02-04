@@ -11,27 +11,35 @@ import Requestor from "../api-driver/components/Requestor";
 export default class Generator extends BaseComponent {
 
     componentWillMount() {
-        this.dataSource = JSON.parse(localStorage.templates||'[]');
+        this.state.dataSource = JSON.parse(localStorage.templates||'[]');
         this.$setInputValue('type','post')
         this.$setInputValue('protocol','http://')
     }
 
+    getTemplateGenerator= ({defaultValues={},template,instance})=>{
+        return <JSTemplateGenerator defaultValues={defaultValues} onSubmit={result=>{
+            // console.log(jsBeautify(htmlBeautify(result)))
+            // this.toast("已复制到剪贴板。");
+            console.log(result.result);
+            result.params.url = result.url;
+            let value = this.state.dataSource;
+            value.push(result)
+            this.setDataSource(value);
+            instance.close();
+        }
+        } template={template}/>
+    }
+
+    setDataSource(dataSource){
+        this.setState({
+            dataSource
+        })
+        //暂时注释
+        localStorage.templates = JSON.stringify(dataSource)
+    }
 
     render() {
-        const JSTemplate = <TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=><JSTemplateGenerator onSubmit={result=>{
-                // console.log(jsBeautify(htmlBeautify(result)))
-                // this.toast("已复制到剪贴板。");
-                console.log(result);
-                let value = this.dataSource;
-                value.push({content:result})
-                this.setState({
-                    dataSource:value
-                })
-                //暂时注释
-                // localStorage.templates = JSON.stringify(value)
-                instance.close();
-            }
-            } template={template}/>)} />;
+        const JSTemplate =<TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=>this.getTemplateGenerator({instance,template}),{width:'80%'})} />;
 
         const UITemplate = <TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=><div>
             <UITemplateGenerator template={template}/>
@@ -46,23 +54,36 @@ export default class Generator extends BaseComponent {
                         UITemplate
                     }
                 </div>}
-                dataSource={this.dataSource}
+                dataSource={this.state.dataSource}
                 columns={[
                     {
-                        title: '名字',
-                        dataIndex: 'name'
+                        title: 'url',
+                        dataIndex: 'url'
                     },
                     {
-                        title: '内容',
-                        dataIndex: 'content'
+                        title: 'params',
+                        dataIndex: 'params'
                     },
                     {
-                        title: '使用记录',
-                        dataIndex: 'record'
+                        title: 'result',
+                        dataIndex: 'result',
+                        render: (text) => text.slice(0,10)
                     },
                     {
-                        title: '编辑',
-                        dataIndex: 'result'
+                        title: 'template',
+                        dataIndex: 'template',
+                        render: (text) => text.slice(0,10)
+                    },
+                    {
+                        title: 'operation',
+                        render:(text,record,index)=><p>
+                            <Button onClick={()=>ModalWrapper.$show(({instance})=>this.getTemplateGenerator({instance,template:record.template,defaultValues:record.params}))}>重新生成</Button>
+                            <Button onClick={()=>{
+                                let dataSource = this.state.dataSource;
+                                dataSource.splice(index,1)
+                                this.setDataSource(dataSource)
+                            }}>删除</Button>
+                        </p>
                     }
                 ]}
             />

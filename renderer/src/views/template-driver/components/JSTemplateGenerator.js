@@ -7,9 +7,18 @@ import Requestor from "../../api-driver/components/Requestor";
 
 export default class JSTemplateGenerator extends BaseComponent {
 
+    componentWillMount(){
+        let {defaultValues = {}} = this.props;
+        Object.entries(defaultValues).forEach(item=>{
+            this.$setInputValue(item[0],item[1]);
+        })
+    }
+
+
     render() {
         let {template,onSubmit} = this.props,
-            parameters = {};
+            parameters = {},
+            orginTemplate = template;
         try{
             template = eval(`(${template})`)();
             parameters = template.parameters;
@@ -24,10 +33,12 @@ export default class JSTemplateGenerator extends BaseComponent {
                 <p className='tar'><Requestor onResult={res=>{
                     debugger
                 }}/></p>
-                <Form layout='inline' onSubmit={e=>{
+                <Form onSubmit={e=>{
                     e.preventDefault();
 
-                    let form = this.$getInputValue(parametersKey);
+                    let
+                        form = this.$getInputValue(parametersKey),
+                        originForm = form;
                     form = parametersKey.reduce((prev,cur,index)=>{
                         let
                             type = Object.prototype.toString.call(new parameters[cur]),
@@ -57,19 +68,26 @@ export default class JSTemplateGenerator extends BaseComponent {
                         return prev;
                     },{})
                     try{
-                        onSubmit&&onSubmit(template.compile(form));
+                        let result = template.compile(form);
+                        onSubmit&&onSubmit({
+                            url:this.$getInputValue("url"),
+                            result,
+                            params:originForm,
+                            template:orginTemplate
+                        });
                     }catch (e){
-                        message.error("编译出错！");
+                        message.error(e,"编译出错！");
                         // 在此处，进行控制台调试
                         console.error(form);
                     }
 
                 }}>
+                    <Form.Item label="url"><Input  defaultValue={this.$getInputValue("url")} onInput={this.$onInput("url")}/></Form.Item>
                     {
                         parametersKey.map((item,i)=>{
                             return <Form.Item key={i} label={item}>
                                 {
-                                    <Input.TextArea height='100' onInput={this.$onInput(item)}/>
+                                    <Input.TextArea defaultValue={this.$getInputValue(item)} onInput={this.$onInput(item)}/>
                                 }
                             </Form.Item>
                         })

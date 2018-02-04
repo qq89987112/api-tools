@@ -5,3 +5,7 @@
 .tar{
     text-align: right;
 }
+
+.ant-table-thead th{
+    white-space: nowrap;
+}
