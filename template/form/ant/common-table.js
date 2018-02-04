@@ -8,19 +8,16 @@ function a() {
             },
         compile(params) {
             const {columns, className,headers} = params;
+            const className2 = className.replace(/^\S/,s=>s.toLowerCase());
             return `
 import React from "react";
 import {Table,Form,Button,Input,Select,Popover,Icon} from "antd";
 import BaseComponent from "../../../../components/ant-custom/BaseAntPage";
-import project from "../../../../js/api/project";
-import ModalWrapper from "../../../../components/ant-custom/ModalWrapper";
-import Uploader from "../../../../components/ant-custom/Uploader";
-import options from "../../../../js/options";
 
 export default class ${className} extends BaseComponent{
 
     componentWillMount() {
-        this.wrapLoadMoreEx(project.query,'${className}');
+        this.wrapLoadMoreEx(,'${className2}');
     }
 
 
@@ -31,7 +28,7 @@ export default class ${className} extends BaseComponent{
                     title={() => <div>
                         <Form layout='inline' onSubmit={e => {
                             e.preventDefault();
-                            this.state.projectInfoLoadMore.reLoad(this.$getInputValue([${headers.map(i=>`"${i}"`,).join("")}]));
+                            this.${className2}LoadMore.reLoad(this.$getInputValue([${headers.map(i=>`"${i}"`)}]));
                         }}>
                             ${
                                 headers.map(i=>`<Form.Item><Input onChange={this.$onInput('${i}')}/></Form.Item>`).join('\r\n')
@@ -44,9 +41,9 @@ export default class ${className} extends BaseComponent{
                             columns.map(i=>`{title: "${i}", dataIndex: '_dataIndex_',},`).join("\r\n")
                         }
                     ]}
-                    dataSource={this.state.projectInfo}
-                    loading={this.$isLoading("projectInfo")}
-                    pagination={this.state.projectInfoPagi}
+                    dataSource={this.state.${className2}}
+                    loading={this.$isLoading("${className2}")}
+                    pagination={this.state.${className2}Pagi}
                 />
             </div>
         )

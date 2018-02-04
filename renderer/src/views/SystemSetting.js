@@ -20,6 +20,7 @@ export default class SystemSetting extends BaseComponent {
             // }
         }}>
             <Form.Item {...FormUtils.formItemLayout(1)} label='接口前缀'><Input defaultValue={this.$getInputValue('baseURL')} onInput={this.$onInput('baseURL')}/></Form.Item>
+            <Form.Item label='请求代码模板'><Input defaultValue={this.$getInputValue('baseURL')} onInput={this.$onInput('baseURL')}/></Form.Item>
             <Form.Item className='tac'><Button loading={this.$isLoading('submit')} htmlType='submit'
                                                type='primary'>保存</Button></Form.Item>
         </Form>;

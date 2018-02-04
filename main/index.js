@@ -4,9 +4,9 @@ let mainWindow;
 const createWindow = () => {
         // Create the browser window.
         mainWindow = new BrowserWindow({
-            width: 1300,
+            width: 800,
             height: 600,
-            frame: false,
+            // frame: false,
             webPreferences: {webSecurity: false}
         });
 

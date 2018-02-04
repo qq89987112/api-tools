@@ -32,15 +32,16 @@ export default class JSTemplateGenerator extends BaseComponent {
                         let
                             type = Object.prototype.toString.call(new parameters[cur]),
                             value = form[cur]||"";
+                            // value = value.replace(/，/g,",");
                         switch (type){
                             case "[object Array]":
-                                value = value ?value.replace(/，/,",").split(",") : [];
+                                value = value ?value.split(/\s+/).filter(i=>i) : [];
                                 break;
                             case "[object String]":
                                 value = value ||"";
                                 break;
                             case "[object Number]":
-                                value = value ? +value : undefined;
+                                value = +value || undefined;
                                 break;
                             case "[object Object]":
                                 try{
@@ -68,7 +69,7 @@ export default class JSTemplateGenerator extends BaseComponent {
                         parametersKey.map((item,i)=>{
                             return <Form.Item key={i} label={item}>
                                 {
-                                    <Input onInput={this.$onInput(item)}/>
+                                    <Input.TextArea height='100' onInput={this.$onInput(item)}/>
                                 }
                             </Form.Item>
                         })
