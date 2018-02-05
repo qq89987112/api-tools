@@ -1,12 +1,15 @@
 function a() {
+
     return {
-        parameters:
-            {
+        parameters:{
                 className: String,
                 labels: Array,
                 fields: Array,
                 fieldValids: Array,
-            },
+        },
+        requestLib:{
+
+        },
         compile(params) {
             const {fields =[], className="", fieldValids=[], labels=[]} = params;
             const
