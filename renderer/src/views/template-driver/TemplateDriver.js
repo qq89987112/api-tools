@@ -6,7 +6,6 @@ import ModalWrapper from "../../components/Base/ModalWrapper";
 import TemplateUpload from "../../components/TemplateUpload";
 import JSTemplateGenerator from "./components/JSTemplateGenerator";
 import UITemplateGenerator from "./components/UITemplateGenerator";
-import Requestor from "../api-driver/components/Requestor";
 
 export default class Generator extends BaseComponent {
 
@@ -24,7 +23,8 @@ export default class Generator extends BaseComponent {
             let value = this.state.dataSource;
             value.push({
                 url:result.url,
-                params:result.params
+                params:result.params,
+                template:result.template
             })
             this.setDataSource(value);
             instance.close();
@@ -45,7 +45,7 @@ export default class Generator extends BaseComponent {
 
         const UITemplate = <TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=><div>
             <UITemplateGenerator template={template}/>
-        </div>,{width:'80%'})} />;
+        </div>,{width:'80%',footer:null})} />;
         return (
             <Table
                 title={()=><div>
@@ -65,7 +65,11 @@ export default class Generator extends BaseComponent {
                     {
                         title: 'operation',
                         render:(text,record,index)=><p>
-                            <Button onClick={()=>ModalWrapper.$show(({instance})=>this.getTemplateGenerator({instance,template:record.template,defaultValues:record.params}))}>重新生成</Button>
+                            <Button onClick={()=>ModalWrapper.$show(({instance})=>{
+                                record.params=record.params||{};
+                                record.params.url = record.url;
+                                return this.getTemplateGenerator({instance,template:record.template,defaultValues:record.params})
+                            })}>重新生成</Button>
                             <Button onClick={()=>{
                                 let dataSource = this.state.dataSource;
                                 dataSource.splice(index,1)

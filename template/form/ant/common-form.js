@@ -5,12 +5,17 @@ function a() {
                 className: String,
                 labels: Array,
                 fields: Array,
-                fieldsType:Array,
                 fieldValids: Array,
             },
         compile(params) {
-            const {fields, className, fieldValids, labels} = params;
-            const className2 = className.replace(/^\S/,s=>s.toLowerCase());
+            const {fields =[], className="", fieldValids=[], labels=[]} = params;
+            const
+                className2 = className.replace(/^\S/,s=>s.toLowerCase()),
+                fieldsTypeMap = fields.reduce((prev,cur)=>{
+                    cur = cur.split(".");
+                    prev[cur[0]] = cur.slice(-1)[0];
+                    return prev;
+                },{});
 
             return `
                                 import {Form,Input,Button,DatePicker,Switch} from "antd";
@@ -20,6 +25,7 @@ function a() {
                                 
                                 // 新增 <Button onClick={()=>ModalWrapper.$show(({instance})=><${className} onSubmit={params=>add(params).then(()=>instance.close()).then(()=>reLoad())} />)} type='primary'>新增</Button>
                                 // 更新 <Button onClick={()=>ModalWrapper.$show(({instance})=><${className} ${className2}={record} onSubmit={params=>update(Object.assign({id:record.id},params)).then(()=>instance.close()).then(()=>reLoad())} />)} type='primary'>更新</Button>
+                                // defaultValue.+?} 
                                 export default class ${className} extends BaseComponent {
                                 
                                     componentWillMount(){
@@ -44,8 +50,14 @@ function a() {
                                             }
                                         }}>
                                         ${
-                labels.map((i, index) => `<Form.Item {...FormUtils.formItemLayout(1)} label='${i}'><Input defaultValue={this.$getInputValue('${fields[index]}')} onInput={this.$onInput('${fields[index]}')}/></Form.Item>`).join("\r\n")
-                }
+                                                labels.map((i, index) =>{
+                                                                            const type = fieldsTypeMap[i];
+                                                                            return  `<Form.Item {...FormUtils.formItemLayout(1)} label='${i}'>${
+                                                                                    type==='textarea'&&`<Input.TextArea defaultValue={this.$getInputValue('${fields[index]}')} onInput={this.$onInput('${fields[index]}')}/>`||
+                                                                                    `<Input defaultValue={this.$getInputValue('${fields[index]}')} onInput={this.$onInput('${fields[index]}')}/>`
+                                                                            }</Form.Item>`
+                                                                }).join("\r\n")
+                                        }
                                             <Form.Item className='tac'><Button loading={this.$isLoading('submit')} htmlType='submit' type='primary'>保存</Button></Form.Item>
                                         </Form>;
                                     }
