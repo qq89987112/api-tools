@@ -21,7 +21,16 @@ function template() {
                 },{});
 
             return `
-                  
+                <div>
+                    {(this.state.list||[]).map(item=><Input defaultValue={item.value} onInput={this.$onInput(value=>item.value=value)} />)}
+                    <Button onClick={()=>{
+                        const list = (this.state.list||[]);
+                        list.push({value:"new"});
+                        this.setState({list})
+                    }}>add</Button>
+                    <Button onClick={()=>console.log(JSON.stringify(this.state.list))}>get</Button>
+                </div>
+
             `
         }
     }

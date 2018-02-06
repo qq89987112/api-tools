@@ -47,38 +47,41 @@ export default class Generator extends BaseComponent {
             <UITemplateGenerator template={template}/>
         </div>,{width:'80%',footer:null})} />;
         return (
-            <Table
-                title={()=><div>
-                    {
-                        JSTemplate
-                    }
-                    {
-                        UITemplate
-                    }
-                </div>}
-                dataSource={this.state.dataSource}
-                columns={[
-                    {
-                        title: 'url',
-                        dataIndex: 'url'
-                    },
-                    {
-                        title: 'operation',
-                        render:(text,record,index)=><p>
-                            <Button onClick={()=>ModalWrapper.$show(({instance})=>{
-                                record.params=record.params||{};
-                                record.params.url = record.url;
-                                return this.getTemplateGenerator({instance,template:record.template,defaultValues:record.params})
-                            })}>重新生成</Button>
-                            <Button onClick={()=>{
-                                let dataSource = this.state.dataSource;
-                                dataSource.splice(index,1)
-                                this.setDataSource(dataSource)
-                            }}>删除</Button>
-                        </p>
-                    }
-                ]}
-            />
+            <div>
+
+                <Table
+                    title={()=><div>
+                        {
+                            JSTemplate
+                        }
+                        {
+                            UITemplate
+                        }
+                    </div>}
+                    dataSource={this.state.dataSource}
+                    columns={[
+                        {
+                            title: 'url',
+                            dataIndex: 'url'
+                        },
+                        {
+                            title: 'operation',
+                            render:(text,record,index)=><p>
+                                <Button onClick={()=>ModalWrapper.$show(({instance})=>{
+                                    record.params=record.params||{};
+                                    record.params.url = record.url;
+                                    return this.getTemplateGenerator({instance,template:record.template,defaultValues:record.params})
+                                })}>重新生成</Button>
+                                <Button onClick={()=>{
+                                    let dataSource = this.state.dataSource;
+                                    dataSource.splice(index,1)
+                                    this.setDataSource(dataSource)
+                                }}>删除</Button>
+                            </p>
+                        }
+                    ]}
+                />
+            </div>
         );
     }
 

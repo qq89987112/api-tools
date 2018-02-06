@@ -87,7 +87,7 @@ export default class JSTemplateGenerator extends BaseComponent {
                         parametersKey.map((item,i)=>{
                             return <Form.Item key={i} label={item}>
                                 {
-                                    <Input.TextArea defaultValue={this.$getInputValue(item)} onInput={this.$onInput(item)}/>
+                                    <Input.TextArea autosize defaultValue={this.$getInputValue(item)} onInput={this.$onInput(item)}/>
                                 }
                             </Form.Item>
                         })

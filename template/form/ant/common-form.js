@@ -47,9 +47,10 @@ function a() {
                                                     ${fields.map((i, index) => `['${i}',v=>v,'${fieldValids[index]}'],`).join("\r\n")}
                                                 )) {
                                                 this.$load('submit');
-                                                onSubmit&&onSubmit(this.$getInputValue([${fields.map(i => `'${i}'`)}])).then(()=>{
-                                                    this.$cancel('submit')
-                                                });
+                                                onSubmit&&onSubmit(this.$getInputValue([${fields.map(i => `'${i}'`)}]),{
+                                                    load:()=>{this.$load('submit'); },
+                                                    cancel:()=>{this.$cancel('submit'); }
+                                                })
                                             }
                                         }}>
                                         ${
