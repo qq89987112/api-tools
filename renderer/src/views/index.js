@@ -30,6 +30,7 @@ class App extends Component {
                     <Route  exact path="/template-driver/js-template" component={JSTemplate}/>
                     <Route  exact path="/api-driver" component={ApiDriver}/>
                     <Route  exact path="/system-setting" component={SystemSetting}/>
+                    <Route  exact path="/system-setting" component={SystemSetting}/>
                 </div>
             </HashRouter>
         );
