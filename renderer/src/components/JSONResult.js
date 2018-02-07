@@ -1,8 +1,27 @@
 import React, {Component} from 'react';
-import {Form, Input, Tree} from 'antd'
+import {Form, Input, Tree,Button} from 'antd'
 import 'antd/dist/antd.css';
+import ModalWrapper from "./Base/ModalWrapper";
 
 const TreeNode = Tree.TreeNode;
+
+
+export class RequestHook{
+    static onRequest(obj){
+        return new Promise((resolve,reject)=>{
+            ModalWrapper.$show(()=><div>
+                <JSONResult json={obj}></JSONResult>
+                <p><Button onClick={resolve}>不拦截</Button><Button onClick={reject}>拦截</Button><Button>拦截返回</Button></p>
+            </div>)
+        })
+    }
+
+    static onResponce(obj){
+        return new Promise((resolve,reject)=>{
+
+        })
+    }
+}
 
 // 左键名字，右键路径。
 export default class JSONResult extends Component {

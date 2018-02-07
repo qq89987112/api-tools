@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import BaseComponent from "../../../components/Base/BaseComponent";
 import Requestor from "../../api-driver/components/Requestor";
 import QuickPropover from "../../api-driver/components/QuickPropover";
-import JSONResult from "../../api-driver/components/JSONResult";
+import JSONResult from "../../../components/JSONResult";
 
 
 export default class UITemplateGenerator extends BaseComponent {
