@@ -6,6 +6,7 @@ import ModalWrapper from "../../components/Base/ModalWrapper";
 import TemplateUpload from "../../components/TemplateUpload";
 import JSTemplateGenerator from "./components/JSTemplateGenerator";
 import UITemplateGenerator from "./components/UITemplateGenerator";
+const { clipboard } = window.require('electron');
 
 export default class Generator extends BaseComponent {
 
@@ -18,7 +19,8 @@ export default class Generator extends BaseComponent {
     getTemplateGenerator= ({defaultValues={},template,instance})=>{
         return <JSTemplateGenerator defaultValues={defaultValues} onSubmit={result=>{
             // console.log(jsBeautify(htmlBeautify(result)))
-            // this.toast("已复制到剪贴板。");
+            clipboard.writeText(result.result);
+            this.toast("已复制到剪贴板。");
             console.log(result.result);
             let value = this.state.dataSource;
             value.push({
@@ -41,7 +43,7 @@ export default class Generator extends BaseComponent {
     }
 
     render() {
-        const JSTemplate =<TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=>this.getTemplateGenerator({instance,template}),{width:'80%'})} />;
+        const JSTemplate =<TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=>this.getTemplateGenerator({instance,template}),{footer:null,width:'80%'})} />;
 
         const UITemplate = <TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=><div>
             <UITemplateGenerator template={template}/>

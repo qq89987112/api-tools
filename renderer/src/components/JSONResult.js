@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Form, Input, Tree,Button} from 'antd'
 import 'antd/dist/antd.css';
-import ModalWrapper from "./ant-custom/ModalWrapper";
+import ModalWrapper from "./Base/ModalWrapper";
 
 const TreeNode = Tree.TreeNode;
 

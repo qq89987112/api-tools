@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import {Select} from "antd"
 import 'antd/dist/antd.css';
-import ApiManager from "./api-driver/ApiDriver";
+import ApiDriver from "./api-driver/ApiDriver";
 import TemplateDriver from "./template-driver/TemplateDriver";
 import SystemSetting from "./SystemSetting";
+import { HashRouter,Route,Link } from 'react-router-dom'
+import JSTemplate from "./remote-views/JSTemplate";
 
 
 class App extends Component {
@@ -13,23 +15,23 @@ class App extends Component {
 
 
     render() {
-        const {type} = this.state;
         return (
-            <div>
-                <div className='tar'>
-                    <Select style={{ width: 120 }} defaultValue='api-driver' onChange={v=>this.setState({type:v})}>
-                        <Select.Option value='api-driver'>API驱动</Select.Option>
-                        <Select.Option value='template-driver'>模板驱动</Select.Option>
-                        <Select.Option value='system-setting'>系统设置</Select.Option>
-                    </Select>
+            <HashRouter>
+                <div>
+                    <div className='tar'>
+                        <Select style={{ width: 120 }} defaultValue='template-driver'>
+                            <Select.Option value='api-driver'><Link to='/api-driver'>API驱动</Link></Select.Option>
+                            <Select.Option value='template-driver'><Link to='/template-driver'>模板驱动</Link></Select.Option>
+                            <Select.Option value='system-setting'><Link to='/system-setting'>系统设置</Link></Select.Option>
+                        </Select>
+                    </div>
+                    <Route  exact path="/" component={TemplateDriver}/>
+                    <Route  exact path="/template-driver" component={TemplateDriver}/>
+                    <Route  exact path="/template-driver/js-template" component={JSTemplate}/>
+                    <Route  exact path="/api-driver" component={ApiDriver}/>
+                    <Route  exact path="/system-setting" component={SystemSetting}/>
                 </div>
-                {
-                    (type==='template-driver'&&<TemplateDriver/>) ||
-                    (type ==='api-driver'&&<ApiManager/>) ||
-                    (type ==='system-setting'&&<SystemSetting/>)
-                }
-
-            </div>
+            </HashRouter>
         );
     }
 }

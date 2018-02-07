@@ -1,4 +1,4 @@
-# demo
+# template demo
 function a() {
     return {
         parameters:{
@@ -15,3 +15,6 @@ function a() {
         }
     }
 }
+
+
+# const { clipboard } = window.require('electron');

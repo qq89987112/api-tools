@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import BaseComponent from "../../components/Base/BaseComponent";
 import Requestor from "./components/Requestor";
 
-export default class Generator extends BaseComponent {
+export default class ApiDriver extends BaseComponent {
     state = {
         dataSource: JSON.parse(localStorage.apis || '[]')
     }
