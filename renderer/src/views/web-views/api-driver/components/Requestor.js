@@ -1,10 +1,10 @@
 import React from 'react';
 import {Form, Input, Button, Select,Radio} from 'antd'
-import BaseComponent from "../../../components/Base/BaseComponent";
-import FormUtils from "../../../js/ant/FormUtils";
+import BaseComponent from "../../../../components/Base/BaseComponent";
+import FormUtils from "../../../../js/ant/FormUtils";
 import axios from "axios"
 import QuickPropover from "./QuickPropover";
-import preference from "../../../js/preference";
+import preference from "../../../../js/preference";
 
 export default class Requestor extends BaseComponent {
     componentWillMount(){

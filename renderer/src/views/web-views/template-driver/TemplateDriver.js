@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {Table,Button} from 'antd'
 import 'antd/dist/antd.css';
-import BaseComponent from "../../components/Base/BaseComponent";
-import ModalWrapper from "../../components/Base/ModalWrapper";
-import TemplateUpload from "../../components/TemplateUpload";
+import BaseComponent from "../../../components/Base/BaseComponent";
+import ModalWrapper from "../../../components/Base/ModalWrapper";
+import TemplateUpload from "../../../components/TemplateUpload";
 import JSTemplateGenerator from "./components/JSTemplateGenerator";
 import UITemplateGenerator from "./components/UITemplateGenerator";
 const { clipboard } = window.require('electron');

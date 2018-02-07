@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Select} from "antd"
 import 'antd/dist/antd.css';
-import ApiDriver from "./api-driver/ApiDriver";
-import TemplateDriver from "./template-driver/TemplateDriver";
+import ApiDriver from "./web-views/api-driver/ApiDriver";
+import TemplateDriver from "./web-views/template-driver/TemplateDriver";
 import SystemSetting from "./SystemSetting";
 import { HashRouter,Route,Link } from 'react-router-dom'
 import JSTemplate from "./remote-views/JSTemplate";

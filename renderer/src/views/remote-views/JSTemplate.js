@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
 import BaseComponent from "../../components/Base/BaseComponent";
-import JSTemplateGenerator from "../template-driver/components/JSTemplateGenerator";
+import JSTemplateGenerator from "../web-views/template-driver/components/JSTemplateGenerator";
 const { clipboard,remote } = window.require('electron');
 
 export default class JSTemplate extends BaseComponent {

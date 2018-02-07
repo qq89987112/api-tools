@@ -11,7 +11,7 @@ const host = process.env.HOST || '0.0.0.0';
 
 module.exports = function(proxy, allowedHost) {
   return {
-    // WebpackDevServer 2.4.3 introduced a security fix that prevents remote
+    // WebpackDevServer 2.4.3 introduced a security fix that prevents remote-main
     // websites from potentially accessing local content through DNS rebinding:
     // https://github.com/webpack/webpack-dev-server/issues/887
     // https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
@@ -23,7 +23,7 @@ module.exports = function(proxy, allowedHost) {
     // compromise. Since our WDS configuration only serves files in the `public`
     // folder we won't consider accessing them a vulnerability. However, if you
     // use the `proxy` feature, it gets more dangerous because it can expose
-    // remote code execution vulnerabilities in backends like Django and Rails.
+    // remote-main code execution vulnerabilities in backends like Django and Rails.
     // So we will disable the host check normally, but enable it if you have
     // specified the `proxy` setting. Finally, we let you override it if you
     // really know what you're doing with a special environment variable.

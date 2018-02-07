@@ -1,10 +1,10 @@
-const {app,BrowserWindow,getGlobal,setGlobal,globalShortcut} = require('electron')
+const {app,BrowserWindow,globalShortcut} = require('electron')
 let mainWindow;
 
 global.baseURL = `http://localhost:3000`;
 global.NODE_ENV = `development`;
 
-app.on('ready', () => {
+let createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -19,13 +19,12 @@ app.on('ready', () => {
         mainWindow.webContents.openDevTools();
     }
 
-
-
     mainWindow.on('closed', () => {
         mainWindow = null;
         globalShortcut.unregisterAll()
     });
-});
+};
+app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -44,8 +43,4 @@ app.on('activate', () => {
     ) {
         createWindow();
     }
-})
-;
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+});
