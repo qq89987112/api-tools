@@ -36,10 +36,10 @@ export class RequestHook{
             if(!data || JSON.stringify(data) === '{}'){
                 return resolve(config);
             }
-            ModalWrapper.$show(({instance})=><div>
+            ModalWrapper.$showNew(({instance})=><div>
                 <div>
                     <p>url地址：{config.url}</p>
-                    <div>参数内容：<JSONResult json={data}/></div>
+                    <div>参数内容({Object.keys(data).length})：<JSONResult json={data}/></div>
                 </div>
                 <p><Button onClick={()=>{
                     resolve(config);
@@ -61,7 +61,7 @@ export class RequestHook{
         return new Promise((resolve,reject)=>{
             if(RequestHook.interceptResponce.get(config.url)){
                 return new Promise((resolve,reject)=>{
-                    ModalWrapper.$show(({instance})=><div style={{position:'relative',zIndex:'1999'}}>
+                    ModalWrapper.$showNew(({instance})=><div style={{position:'relative',zIndex:'1999'}}>
                         <div>
                             <p>url地址：{config.url}</p>
                             <div>返回内容：<JSONResult json={obj}/></div>
