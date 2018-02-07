@@ -1,24 +1,83 @@
 import React, {Component} from 'react';
 import {Form, Input, Tree,Button} from 'antd'
 import 'antd/dist/antd.css';
-import ModalWrapper from "./Base/ModalWrapper";
+import ModalWrapper from "./ant-custom/ModalWrapper";
 
 const TreeNode = Tree.TreeNode;
 
-
+// axios.interceptors.request.use(function (config) {
+//     return RequestHook.onRequest(config);
+// }, function (error) {
+//     // 对请求错误做些什么
+//     return Promise.reject(error);
+// });
+//
+// axios.interceptors.response.use(data => {
+//     let config = data.config;
+//     if(/\.json$/.test(config.url)){
+//         return data.data;
+//     }
+//     data = data.data.data;
+//     // if (data.pageError || !data.status) {
+//     //     return Promise.reject(data);
+//     // }
+//     return RequestHook.onResponce(data,config);
+// }, error => {
+//     console.table(error);
+//     return Promise.reject(error)
+// });
 export class RequestHook{
-    static onRequest(obj){
+
+    static interceptResponce = new Map();
+
+    static onRequest(config){
         return new Promise((resolve,reject)=>{
-            ModalWrapper.$show(()=><div>
-                <JSONResult json={obj}></JSONResult>
-                <p><Button onClick={resolve}>不拦截</Button><Button onClick={reject}>拦截</Button><Button>拦截返回</Button></p>
-            </div>)
+            let data = config.data;
+            if(!data || JSON.stringify(data) === '{}'){
+                return resolve(config);
+            }
+            ModalWrapper.$show(({instance})=><div>
+                <div>
+                    <p>url地址：{config.url}</p>
+                    <div>参数内容：<JSONResult json={data}/></div>
+                </div>
+                <p><Button onClick={()=>{
+                    resolve(config);
+                    instance.close();
+                }}>不拦截</Button><Button onClick={()=>{
+                    reject("接口被拦截");
+                    instance.close();
+                }}>拦截</Button><Button onClick={()=>{
+                    RequestHook.interceptResponce.set(config.url,true)
+                    resolve(config);
+                    instance.close();
+                //    页面上能看到返回是否正常就不需要拦截
+                }}>拦截返回</Button></p>
+            </div>,{footer:null,zIndex:1001})
         })
     }
 
-    static onResponce(obj){
+    static onResponce(obj,config){
         return new Promise((resolve,reject)=>{
-
+            if(RequestHook.interceptResponce.get(config.url)){
+                return new Promise((resolve,reject)=>{
+                    ModalWrapper.$show(({instance})=><div style={{position:'relative',zIndex:'1999'}}>
+                        <div>
+                            <p>url地址：{config.url}</p>
+                            <div>返回内容：<JSONResult json={obj}/></div>
+                        </div>
+                        <p><Button onClick={()=>{
+                            resolve(obj)
+                            instance.close();
+                        }}>不拦截</Button><Button onClick={()=>{
+                            reject("接口被拦截");
+                            instance.close();
+                        }}>拦截</Button></p>
+                    </div>,{footer:null,zIndex:1001})
+                })
+            }else{
+                resolve(obj);
+            }
         })
     }
 }
