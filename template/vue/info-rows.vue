@@ -32,11 +32,15 @@
   .consum-record-page {
     height: 100vh !important;
 
-    .info-rows{
+    .info-rows {
+      margin: R(15) 0;
+      padding: R(15);
+      background-color: #fff;
+      .info-row + .info-row{
+        margin-top: R(15);
+      }
       .info-row {
         overflow: hidden;
-        border-top: R(1) solid #f4f4f4;
-        margin-top: R(15);
         line-height: 2.5em;
 
         .value {
