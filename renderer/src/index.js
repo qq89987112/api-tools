@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import "./js/remote-main/index"
+import "./remote-main/index"
 import './index.css';
 import App from './views/index';
 import './assests';
