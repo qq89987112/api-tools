@@ -20,8 +20,9 @@ class App extends Component {
                 <div>
                     <div className='tar'>
                         <Select style={{ width: 120 }} defaultValue='template-driver'>
-                            <Select.Option value='api-driver'><Link to='/api-driver'>API驱动</Link></Select.Option>
                             <Select.Option value='template-driver'><Link to='/template-driver'>模板驱动</Link></Select.Option>
+                            <Select.Option value='api-driver'><Link to='/api-driver'>接口管理(可自动爬取接口,用于生成接口代码和验证接口参数(定时更新)时使用。)</Link></Select.Option>
+                            <Select.Option value='template-manager'><Link to='/template-manager'>模板管理(可设快捷键)</Link></Select.Option>
                             <Select.Option value='system-setting'><Link to='/system-setting'>系统设置</Link></Select.Option>
                         </Select>
                     </div>
