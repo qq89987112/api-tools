@@ -32,6 +32,9 @@ export class RequestHook{
 
     static onRequest(config){
         return new Promise((resolve,reject)=>{
+            if(process.env.NODE_ENV!=='development'){
+                return resolve(config);
+            }
             let data = config.data;
             if(!data || JSON.stringify(data) === '{}'){
                 return resolve(config);
@@ -51,7 +54,7 @@ export class RequestHook{
                     RequestHook.interceptResponce.set(config.url,true)
                     resolve(config);
                     instance.close();
-                //    页面上能看到返回是否正常就不需要拦截
+                    //    页面上能看到返回是否正常就不需要拦截
                 }}>拦截返回</Button></p>
             </div>,{footer:null,zIndex:1001})
         })
@@ -61,6 +64,9 @@ export class RequestHook{
         return new Promise((resolve,reject)=>{
             if(RequestHook.interceptResponce.get(config.url)){
                 return new Promise((resolve,reject)=>{
+                    if(process.env.NODE_ENV!=='development'){
+                        return resolve(obj);
+                    }
                     ModalWrapper.$showNew(({instance})=><div style={{position:'relative',zIndex:'1999'}}>
                         <div>
                             <p>url地址：{config.url}</p>
@@ -96,12 +102,12 @@ export default class JSONResult extends Component {
             title = isParent(value) ? key : `${key}:${value}`,
             content = isParent(value)&&Object.entries(value).map(item => this.loop(path,item[0],item[1]));
 
-            if(content&&content.length===0){
-                //空对象和数组
-                title = `${title}:${JSON.stringify(value)}`
-                //去除箭头
-                content = undefined;
-            }
+        if(content&&content.length===0){
+            //空对象和数组
+            title = `${title}:${JSON.stringify(value)}`
+            //去除箭头
+            content = undefined;
+        }
         return <TreeNode title={title} key={path}>{content}</TreeNode>
     }
 
