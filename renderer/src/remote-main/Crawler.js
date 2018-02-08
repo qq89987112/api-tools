@@ -1,3 +1,9 @@
-export default Crawler{
+export default class Crawler{
+    constructor(url){
 
+    }
+
+    crawl(){
+
+    }
 }
