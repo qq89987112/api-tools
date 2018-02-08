@@ -1,7 +1,7 @@
 <template>
     <loading class="consum-record-page" ref="loading">
         <div class="list" v-load-more="loadNext">
-            <div class="list-item">
+            <div class="list-item" v-for="item in list">
 
             </div>
         </div>
@@ -22,12 +22,13 @@
             }
         },
         created() {
-
+            this.reLoad();
         },
         mounted() {
         },
         methods: {
             reLoad(){
+                this.list = [];
                 this.params = {
                     page:1,
                     rows:10
@@ -40,7 +41,9 @@
             },
             loadPage(page){
                 this.params.page = page;
-                service.dispatchList(this.params)
+                service.dispatchList(this.params).then(data=>{
+                    this.list.concat(data.data);
+                })
             }
         }
     }
