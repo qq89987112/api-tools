@@ -42,10 +42,15 @@
     height: 100vh !important;
     display: flex;
     flex-direction: column;
+    padding: 15px;
 
     .tabs {
       display: flex;
       line-height: 2em;
+      width: R(180);
+      margin: R(15) auto 0;
+      border: R(1) solid #707071;
+      border-radius: R(5);
       .tab {
         flex: 1;
         text-align: center;
