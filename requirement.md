@@ -4,3 +4,4 @@
     可以使用区域选择选中页面元素,获取相关参数 加入到 RegExtractor 中。
     ServerSide jQuery
 使用对象替代 $setInputValue(好处 可以直接传入函数。(需要重写 验证方法))
+快捷键
