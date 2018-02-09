@@ -3,6 +3,7 @@ import {Select} from "antd"
 import 'antd/dist/antd.css';
 import ApiDriver from "./web-views/api-driver/ApiDriver";
 import TemplateDriver from "./web-views/template-driver/TemplateDriver";
+import TemplateManager from "./web-views/template-driver/TemplateManager";
 import SystemSetting from "./SystemSetting";
 import { HashRouter,Route,Link } from 'react-router-dom'
 import JSTemplate from "./remote-views/JSTemplate";
@@ -30,7 +31,7 @@ class App extends Component {
                     <Route  exact path="/template-driver" component={TemplateDriver}/>
                     <Route  exact path="/template-driver/js-template" component={JSTemplate}/>
                     <Route  exact path="/api-driver" component={ApiDriver}/>
-                    <Route  exact path="/system-setting" component={SystemSetting}/>
+                    <Route  exact path="/template-manager" component={TemplateManager}/>
                     <Route  exact path="/system-setting" component={SystemSetting}/>
                 </div>
             </HashRouter>
