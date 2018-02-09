@@ -9,9 +9,10 @@ let createWindow = () => {
         width: 800,
         height: 600,
         // frame: false,
-        webPreferences: {webSecurity: false}
+        webPreferences: {webSecurity: false},
+        alwaysOnTop:true
     });
-
+    global.mainWindow = mainWindow;
     mainWindow.loadURL(global.baseURL);
 
     if(global.NODE_ENV === `development`){

@@ -7,6 +7,8 @@ import TemplateUpload from "../../../components/TemplateUpload";
 import JSTemplateGenerator from "./components/JSTemplateGenerator";
 import UITemplateGenerator from "./components/UITemplateGenerator";
 import TemplateManager from "./TemplateManager";
+
+
 const { clipboard } = window.require('electron');
 
 export default class Generator extends BaseComponent {
@@ -36,10 +38,6 @@ export default class Generator extends BaseComponent {
         } template={template}/>
     }
 
-    setDataSource(dataSource){
-
-        //暂时注释
-    }
 
     render() {
         const JSTemplate =<TemplateUpload  onTemplate={template=>ModalWrapper.$show(({instance})=>this.getTemplateGenerator({instance,template}),{footer:null,width:'80%'})} />;

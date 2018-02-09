@@ -7,18 +7,19 @@ import Requestor from "../../api-driver/components/Requestor";
 
 export default class JSTemplateGenerator extends BaseComponent {
 
-    componentWillMount(){
-        let {defaultValues = {}} = this.props;
-        Object.entries(defaultValues).forEach(item=>{
-            this.$setInputValue(item[0],item[1]);
-        })
-    }
 
 
     render() {
-        let {template,onSubmit} = this.props,
+        let {template,onSubmit,defaultValues = {}} = this.props,
             parameters = {},
             orginTemplate = template;
+
+        if(!template) return <div>模板为空！</div>
+
+        Object.entries(defaultValues).forEach(item=>{
+            this.$setInputValue(item[0],item[1]);
+        })
+
         try{
             template = eval(`(${template})`)();
             parameters = template.parameters;

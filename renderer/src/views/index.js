@@ -6,7 +6,8 @@ import TemplateDriver from "./web-views/template-driver/TemplateDriver";
 import TemplateManager from "./web-views/template-driver/TemplateManager";
 import SystemSetting from "./SystemSetting";
 import { HashRouter,Route,Link } from 'react-router-dom'
-import JSTemplate from "./remote-views/JSTemplate";
+import JSTemplate from "./web-views/template-driver/JSTemplate";
+import TemplateShortcut from "../remote-main/TemplateShortcut";
 
 
 class App extends Component {
@@ -14,6 +15,9 @@ class App extends Component {
         type:'api-driver'
     }
 
+    componentWillMount(){
+        TemplateShortcut.reLoad();
+    }
 
     render() {
         return (
