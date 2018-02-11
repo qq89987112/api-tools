@@ -26,7 +26,7 @@ export default class ${className} extends BaseComponent{
         return (
             <div>
                 <Table
-                    footer={()=>`共{(this.state.${className2}Pagi||{}).total}条`}
+                    footer={()=>\`共\${(this.state.${className2}Pagi||{}).total}条\`}
                     title={() => <div>
                         <Form layout='inline' onSubmit={e => {
                             e.preventDefault();
