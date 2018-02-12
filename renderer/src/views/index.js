@@ -5,6 +5,7 @@ import ApiDriver from "./web-views/api-driver/ApiDriver";
 import TemplateDriver from "./web-views/template-driver/TemplateDriver";
 import TemplateManager from "./web-views/template-driver/TemplateManager";
 import SystemSetting from "./SystemSetting";
+import RemoteViews from "./remote-views";
 import { HashRouter,Route,Link } from 'react-router-dom'
 import JSTemplate from "./web-views/template-driver/JSTemplate";
 import TemplateShortcut from "../remote-main/TemplateShortcut";
@@ -32,6 +33,7 @@ class App extends Component {
                         </Select>
                     </div>
                     <Route  exact path="/" component={TemplateDriver}/>
+                    <Route  exact path="/remote-view" component={TemplateDriver}/>
                     <Route  exact path="/template-driver" component={TemplateDriver}/>
                     <Route  exact path="/template-driver/js-template" component={JSTemplate}/>
                     <Route  exact path="/api-driver" component={ApiDriver}/>

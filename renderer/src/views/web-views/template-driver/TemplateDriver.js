@@ -23,16 +23,11 @@ export default class Generator extends BaseComponent {
             this.toast("已复制到剪贴板。");
             console.log(result.result);
             let value = this.state.dataSource ||[];
-            let newTemplate = {
-                url:result.url,
-                params:result.params,
-                template:result.template
-            };
-            value.push(newTemplate)
+            value.push(result)
             this.setState({
                 dataSource:value
             })
-            this.refs.templateManager.addTemplate(newTemplate);
+            this.refs.templateManager.addTemplate(result);
             instance.close();
         }
         } template={template}/>

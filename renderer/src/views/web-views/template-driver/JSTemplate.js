@@ -35,7 +35,7 @@ export default class JSTemplate extends BaseComponent {
                     console.log(result.result);
                     let value = this.state.dataSource;
                     value.push({
-                        url:result.url,
+                        location:result.location,
                         params:result.params,
                         template:result.template
                     })

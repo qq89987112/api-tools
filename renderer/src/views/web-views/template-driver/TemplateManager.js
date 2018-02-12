@@ -43,8 +43,8 @@ export default class TemplateManager extends BaseComponent {
                     dataSource={this.state.dataSource}
                     columns={[
                         {
-                            title: 'url',
-                            dataIndex: 'url'
+                            title: 'location',
+                            dataIndex: 'location'
                         },
                         {
                             title: 'shortcut',

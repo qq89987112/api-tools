@@ -89,17 +89,20 @@ export class RequestHook{
 }
 
 // 左键名字，右键路径。
+//props: title,json,name
 export default class JSONResult extends Component {
 
 
     loop(path,key,value) {
+        let {node} = this.props;
         function isParent(obj) {
             let type = Object.prototype.toString.call(obj);
             return type === "[object Object]" || type === "[object Array]";
         }
         path = `${path}.${key}`;
+
         let
-            title = isParent(value) ? key : `${key}:${value}`,
+            title = isParent(value) ? key : node ? node(key,value):`${key}:${value}`,
             content = isParent(value)&&Object.entries(value).map(item => this.loop(path,item[0],item[1]));
 
         if(content&&content.length===0){

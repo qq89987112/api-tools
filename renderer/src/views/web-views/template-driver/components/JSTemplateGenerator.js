@@ -74,6 +74,7 @@ export default class JSTemplateGenerator extends BaseComponent {
                     },{})
                     try{
                         let result = template.compile(form);
+                        //
                         onSubmit&&onSubmit({
                             location:this.$getInputValue("location"),
                             result,

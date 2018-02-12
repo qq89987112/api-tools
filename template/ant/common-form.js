@@ -73,7 +73,7 @@ function a() {
                                                                 const type = fieldsTypeMap[i];
                                                                 return  `<Form.Item {...FormUtils.formItemLayout(1)} label='${i}'>${
                                                                 type==='textarea'&&`<Input.TextArea defaultValue={this.$getInputValue('${fields[index]}')} onInput={this.$onInput('${fields[index]}')}/>`||
-                                                                `<Input defaultValue={${className2}.${fields[index]}')} onInput={this.$onInput('${fields[index]}')}/>`
+                                                                `<Input defaultValue={${className2}.${fields[index]}} onInput={this.$onInput('${fields[index]}')}/>`
                                                                     }</Form.Item>`
                                                             }).join("\r\n")
                                                         }
