@@ -3,7 +3,7 @@ import {Form,Input,Button,message} from 'antd'
 import 'antd/dist/antd.css';
 import BaseComponent from "../../../../components/Base/BaseComponent";
 import Requestor from "../../api-driver/components/Requestor";
-
+const { clipboard } = window.require('electron');
 
 export default class JSTemplateGenerator extends BaseComponent {
 
@@ -15,6 +15,10 @@ export default class JSTemplateGenerator extends BaseComponent {
             orginTemplate = template;
 
         if(!template) return <div>模板为空！</div>
+
+        if(!defaultValues.location){
+            defaultValues.location = clipboard.readText();
+        }
 
         Object.entries(defaultValues).forEach(item=>{
             this.$setInputValue(item[0],item[1]);
@@ -71,7 +75,7 @@ export default class JSTemplateGenerator extends BaseComponent {
                     try{
                         let result = template.compile(form);
                         onSubmit&&onSubmit({
-                            url:this.$getInputValue("url"),
+                            location:this.$getInputValue("location"),
                             result,
                             params:originForm,
                             template:orginTemplate
@@ -83,7 +87,7 @@ export default class JSTemplateGenerator extends BaseComponent {
                     }
 
                 }}>
-                    <Form.Item label="url"><Input  defaultValue={this.$getInputValue("url")} onInput={this.$onInput("url")}/></Form.Item>
+                    <Form.Item label="location"><Input  defaultValue={this.$getInputValue("location")} onInput={this.$onInput("location")}/></Form.Item>
                     {
                         parametersKey.map((item,i)=>{
                             return <Form.Item key={i} label={item}>
