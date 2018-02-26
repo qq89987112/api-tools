@@ -27,7 +27,18 @@ function a() {
                                 import BaseComponent from "./BaseComponent";
                                 
                                 // 新增 <Button onClick={()=>ModalWrapper.$show(({instance})=><${className} onSubmit={params=>add(params).then(()=>instance.close()).then(()=>reLoad())} />)} type='primary'>新增</Button>
-                                // 更新 <Button onClick={()=>ModalWrapper.$show(({instance})=><${className} ${className2}={record} onSubmit={params=>update(Object.assign({id:record.id},params)).then(()=>instance.close()).then(()=>reLoad())} />)} type='primary'>更新</Button>
+                                // 更新 
+                                //<Button onClick={()=>ModalWrapper.$show(({instance})=>
+                                //<AdminEdit
+                                //>    adminEdit={record}
+                                //    onSubmit={params=>update(Object.assign({id:record.id},params))
+                                //        .catch(()=>{
+    //
+                                //        }).
+                                //        then(()=>{
+                                //        instance.close()
+                                //        reLoad()
+                                //    })} />)} type='primary'>修改</Button>
                                 // defaultValue.+?} 
                                 export default class ${className} extends BaseComponent {
 
@@ -37,6 +48,7 @@ function a() {
                                     
                                     componentWillMount(){
                                         const {${className2}={}} = this.props;
+                                        this.$setFormValue(adminEdit);
                                         this.setState({
                                             ${className2}
                                         })
