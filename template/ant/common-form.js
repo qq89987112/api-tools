@@ -29,16 +29,19 @@ function a() {
                                 // 新增 <Button onClick={()=>ModalWrapper.$show(({instance})=><${className} onSubmit={params=>add(params).then(()=>instance.close()).then(()=>reLoad())} />)} type='primary'>新增</Button>
                                 // 更新 
                                 //<Button onClick={()=>ModalWrapper.$show(({instance})=>
-                                //<AdminEdit
-                                //>    adminEdit={record}
-                                //    onSubmit={params=>update(Object.assign({id:record.id},params))
+                                //<${className}
+                                //    ${className2}={record}
+                                //    onSubmit={(params,control)=>{
+                                //    control.load();
+                                //    update(Object.assign({id:record.id},params))
                                 //        .catch(()=>{
     //
                                 //        }).
                                 //        then(()=>{
+                                //        control.cancel();
                                 //        instance.close()
                                 //        reLoad()
-                                //    })} />)} type='primary'>修改</Button>
+                                //    })}} />)} type='primary'>修改</Button>
                                 // defaultValue.+?} 
                                 export default class ${className} extends BaseComponent {
 
@@ -48,7 +51,7 @@ function a() {
                                     
                                     componentWillMount(){
                                         const {${className2}={}} = this.props;
-                                        this.$setFormValue(adminEdit);
+                                        this.$setFormValue(${className2});
                                         this.setState({
                                             ${className2}
                                         })
@@ -70,10 +73,9 @@ function a() {
                                         return <div>{${className2}&&
                                                         <Form onSubmit={e=>{
                                                             e.preventDefault();
-                                                            if (!this.formCheck([
+                                                            if (!this.$formCheck(
                                                                     ${fields.map((i, index) => `['${i}',v=>v,'${fieldValids[index]}'],`).join("\r\n")}
-                                                                ],this.params)) {
-                                                                this.$load('submit');
+                                                                )) {
                                                                 onSubmit&&onSubmit(this.$getInputValue([${fields.map(i => `'${i}'`)}]),{
                                                                     load:()=>{this.$load('submit'); },
                                                                     cancel:()=>{this.$cancel('submit'); }
