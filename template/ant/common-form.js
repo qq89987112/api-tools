@@ -26,7 +26,16 @@ function a() {
                                 import FormUtils from "./ant-custom/FormUtils";
                                 import BaseComponent from "./BaseComponent";
                                 
-                                // 新增 <Button onClick={()=>ModalWrapper.$show(({instance})=><${className} onSubmit={params=>add(params).then(()=>instance.close()).then(()=>reLoad())} />)} type='primary'>新增</Button>
+                                // 新增 
+                                //  <Button onClick={()=>
+                                //    ModalWrapper.$show(({instance})=><${className}
+                                //    onSubmit={(params,control)=>{
+                                //        control.load();
+                                //        this.wrapReadLoad(add,name).then(()=>{
+                                //            control.cancel();
+                                //            instance.close();
+                                //        })
+                                //    }} />)} type='primary'>新增</Button>
                                 // 更新 
                                 //<Button onClick={()=>ModalWrapper.$show(({instance})=>
                                 //<${className}
@@ -50,7 +59,9 @@ function a() {
                                    }
                                     
                                     componentWillMount(){
-                                        const {${className2}={}} = this.props;
+                                        let {${className2}} = this.props;
+                                        this.${className2} = ${className2};
+                                        ${className2} = ${className2} || {};
                                         this.$setFormValue(${className2});
                                         this.setState({
                                             ${className2}
