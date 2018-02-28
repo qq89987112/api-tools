@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import { Layout, Input, Breadcrumb, Button } from 'antd';
+import { Layout, Input, Breadcrumb, Button,Tree  } from 'antd';
 import BaseComponent from "../../../components/Base/BaseComponent";
-import JSONResult from "../../../components/JSONResult";
 import 'antd/dist/antd.css';
 import "./css/OverviewBrowser.scss"
 import {RouteTabs} from "../../../components/TabSideContainer";
 import serverSideJquery from "../../../js/server-side-jquery"
 const { Header, Content, Footer, Sider } = Layout;
+const TreeNode = Tree.TreeNode;
 
 export default class OverviewBrowser extends BaseComponent {
     componentWillMount(){
@@ -30,7 +30,7 @@ export default class OverviewBrowser extends BaseComponent {
               </Header>
               <Layout>
                   <Sider>
-                      <JSONResult/>
+                      这里使用异步加载的tree
                   </Sider>
                   <Content class='content'>
                       <RouteTabs/>
