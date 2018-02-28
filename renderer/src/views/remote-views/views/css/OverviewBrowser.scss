@@ -1,0 +1,10 @@
+.overview-browser-page{
+  height: 100vh;
+  .header{
+    -webkit-app-region:drag;
+    display: flex;
+    .input{
+      flex: 1;
+    }
+  }
+}

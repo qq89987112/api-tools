@@ -8,12 +8,12 @@ let createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        // frame: false,
+        frame: false,
         webPreferences: {webSecurity: false},
         alwaysOnTop:true
     });
     global.mainWindow = mainWindow;
-    mainWindow.loadURL(global.baseURL);
+    mainWindow.loadURL(`${global.baseURL}/#/remove-views`);
 
     if(global.NODE_ENV === `development`){
         //打开控制台

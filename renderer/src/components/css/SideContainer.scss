@@ -1,0 +1,49 @@
+.side-container {
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  &.router{
+    .side-content-wrapper{
+      padding: 20px 10px;
+      .side-content{
+        padding: 20px;
+      }
+    }
+  }
+
+  .ant-layout-sider{
+    .ant-layout-sider-children{
+      overflow-y: auto;
+    }
+  }
+
+  .side-menu{
+    .anticon{
+      font-size: 16px;
+      display: inline-block;
+      margin-right: 20px;
+    }
+  }
+  .side-content-header{
+    background-color: #fff;
+    text-align: right;
+  }
+  .side-content-wrapper{
+    padding: 10px;
+    height: 100%;
+    background-color: #f4f4f4;
+
+    .side-content{
+      overflow-y: auto;
+      height: 100%;
+      background-color: #fff;
+      .tab-panel{
+        padding: 0 15px;
+      }
+    }
+  }
+}
