@@ -3,8 +3,16 @@
   .header{
     -webkit-app-region:drag;
     display: flex;
+
+    >*{
+      -webkit-app-region:no-drag;
+    }
+
     .input{
       flex: 1;
+    }
+    .button{
+
     }
   }
 
