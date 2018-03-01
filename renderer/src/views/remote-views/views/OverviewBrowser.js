@@ -18,12 +18,14 @@ export default class OverviewBrowser extends BaseComponent {
             bgcw={backgroundColor:'white'},
             regExps = {
                 "http://119.29.103.231:38888/index.html":$=>{
-                    console.log($("ol > li > div"));
-                    return [{
-                        title:'title',
-                        key:'item-key',
-                        url:'http://119.29.103.231:38888/index.html'
-                    }]
+                    let $ol = $("ol > li > div");
+                    return [].concat($ol.get()).map(item => {
+                        let title = $(item).text().split("...");
+                        return {
+                            title: title[0].replace(/\s/g, ""),
+                            url: (title[1] || "").replace(/\s/g, "")
+                        };
+                    });
                 }
             };
         return (

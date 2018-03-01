@@ -39,10 +39,10 @@ export class MTree extends React.Component {
         return data.map((item,index) => {
             // 将这段放在  if (item.children) { 里就会报错。
             // ===
-            path = path.split("-");
-            path.push(index);
-            path = path.filter(i=>i===0||i);
-            item.key = path.join("-");
+            let path2 = path.split("-");
+            path2.push(index);
+            path2 = path2.filter(i=>i===0||i);
+            item.key = path2.join("-");
             // ===
 
             if (item.children) {
