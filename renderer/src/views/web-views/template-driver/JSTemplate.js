@@ -8,6 +8,7 @@ const { clipboard,remote } = window.require('electron');
 export default class JSTemplate extends BaseComponent {
 
     componentWillMount() {
+        // 注册全局快捷键监听，避免已打开这个界面时的快捷按键不刷新界面
         const setState = (template)=> {
             this.setState({
                 params:template.params||{},
@@ -17,7 +18,17 @@ export default class JSTemplate extends BaseComponent {
         TemplateShortcut.onShortcut((shortcut,template)=>{
             setState(template);
         })
-        setState(this.props.location.state || {});
+        //
+        let
+            {uri} = this.props.match,
+            template = this.props.location.state || {};
+        if(uri){
+            const fs = remote.require("fs");
+            template = {
+                template :fs.readFileSync(decodeURIComponent(uri))
+            };
+        }
+        setState(template);
     }
 
 

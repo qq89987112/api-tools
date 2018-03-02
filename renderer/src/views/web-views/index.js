@@ -35,6 +35,7 @@ export default class WebViews extends BaseComponent {
                         <Route exact path={url + "/remote-view"} component={TemplateDriver}/>,
                         <Route exact path={url + "/template-driver"} component={TemplateDriver}/>,
                         <Route exact path={url + "/template-driver/js-template"} component={JSTemplate}/>,
+                        <Route exact path={url + "/template-driver/js-template/:uri"} component={JSTemplate}/>,
                         <Route exact path={url + "/api-driver"} component={ApiDriver}/>,
                         <Route exact path={url + "/template-manager"} component={TemplateManager}/>,
                         <Route exact path={url + "/system-setting"} component={SystemSetting}/>

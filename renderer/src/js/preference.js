@@ -4,12 +4,12 @@ let self = {
         return key ? setting[key] : setting;
     },
     set(prefix,key,value){
-        if(key){
+        if(value){
             const setting = JSON.parse(localStorage[prefix]||'{}');
             setting[key] = value;
             localStorage[prefix] = JSON.stringify(setting);
         }else{
-            localStorage[prefix] = JSON.stringify(value);
+            localStorage[prefix] = JSON.stringify(key);
         }
     },
     getSetting(key){

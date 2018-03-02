@@ -9,11 +9,12 @@ let createWindow = () => {
         width: 800,
         height: 600,
         frame: false,
+        transparent: true,
         webPreferences: {webSecurity: false},
         alwaysOnTop:true
     });
     global.mainWindow = mainWindow;
-    mainWindow.loadURL(`${global.baseURL}/#/remove-views`);
+    mainWindow.loadURL(`${global.baseURL}/#/remove-views/mini`);
 
     if(global.NODE_ENV === `development`){
         //打开控制台

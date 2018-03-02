@@ -17,9 +17,9 @@ export default class RemoteViews extends BaseComponent {
         const {url} = this.props.match;
         return (
             <div>
-                <Route  path={url} component={OverviewBrowser}/>
-                <Route  path={url + '/overview-browser'} component={OverviewBrowser}/>
-                <Route  path={url + '/mini'} component={Mini}/>
+                <Route exact path={url} component={OverviewBrowser}/>
+                <Route exact path={url + '/overview-browser'} component={OverviewBrowser}/>
+                <Route exact path={url + '/mini'} component={Mini}/>
             </div>
         );
     }
