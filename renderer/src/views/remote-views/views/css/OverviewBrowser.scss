@@ -16,6 +16,22 @@
     }
   }
 
+  .slider{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-color: #fff;
+    overflow-y: auto;
+    &::-webkit-scrollbar{
+      width: 6px;
+      height: 6px;
+    }
+    &::-webkit-scrollbar-thumb{
+      background-color: #c2c2c2;
+      background-clip: padding-box;
+      min-height: 28px;
+    }
+  }
+
   .content{
     height: 100%;
   }
