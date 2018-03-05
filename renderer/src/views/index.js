@@ -5,6 +5,7 @@ import { HashRouter,Route,Link } from 'react-router-dom'
 import TemplateShortcut from "../remote-main/TemplateShortcut";
 import WebViews from "./web-views";
 import { Provider } from 'react-redux'
+import store from '../store'
 
 class App extends Component {
 
@@ -14,13 +15,14 @@ class App extends Component {
 
     render() {
         return (
-            使用 redux 优化 shortcut + template 的管理
-            <HashRouter>
-                <div>
-                    <Route path='/remove-views' component={RemoteViews}/>
-                    <Route path='/web-views' component={WebViews}/>
-                </div>
-            </HashRouter>
+            <Provider store={store}>
+                <HashRouter>
+                    <div>
+                        <Route path='/remove-views' component={RemoteViews}/>
+                        <Route path='/web-views' component={WebViews}/>
+                    </div>
+                </HashRouter>
+            </Provider>
         );
     }
 }

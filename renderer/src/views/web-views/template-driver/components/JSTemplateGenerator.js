@@ -3,18 +3,18 @@ import {Form,Input,Button,message} from 'antd'
 import 'antd/dist/antd.css';
 import BaseComponent from "../../../../components/Base/BaseComponent";
 import Requestor from "../../api-driver/components/Requestor";
+import { connect } from 'react-redux'
 const { clipboard } = window.require('electron');
 
-export default class JSTemplateGenerator extends BaseComponent {
-
-
+class JSTemplateGenerator extends BaseComponent {
 
     render() {
-        let {template,onSubmit,defaultValues = {}} = this.props,
+        let {template,onSubmit,dispatch} = this.props,
             parameters = {},
+            defaultValues = template.params||{},
             orginTemplate = template;
 
-        if(!template) return <div>模板为空！</div>
+        if(!template.template) return <div>模板为空！</div>
 
         if(!defaultValues.location){
             defaultValues.location = clipboard.readText();
@@ -25,7 +25,7 @@ export default class JSTemplateGenerator extends BaseComponent {
         })
 
         try{
-            template = eval(`(${template})`)();
+            template = eval(`(${template.template})`)();
             parameters = template.parameters;
         }catch(e){
             console.error(e);
@@ -48,7 +48,7 @@ export default class JSTemplateGenerator extends BaseComponent {
                         let
                             type = Object.prototype.toString.call(new parameters[cur]),
                             value = form[cur]||"";
-                            // value = value.replace(/，/g,",");
+                        // value = value.replace(/，/g,",");
                         switch (type){
                             case "[object Array]":
                                 value = value ?value.split(/\s+/).filter(i=>i) : [];
@@ -75,14 +75,20 @@ export default class JSTemplateGenerator extends BaseComponent {
                     try{
                         let result = template.compile(form);
                         //
-                        onSubmit&&onSubmit({
+
+                        clipboard.writeText(result.result);
+                        this.toast("已复制到剪贴板。");
+
+
+                        let template = {
                             location:this.$getInputValue("location"),
-                            result,
                             params:originForm,
                             template:orginTemplate
-                        });
+                        };
+                        dispatch(template);
+                        onSubmit&&onSubmit(template);
                     }catch (e){
-                        message.error(e,"编译出错！");
+                        message.error("编译出错！");
                         // 在此处，进行控制台调试
                         console.error(form);
                     }
@@ -105,3 +111,9 @@ export default class JSTemplateGenerator extends BaseComponent {
         );
     }
 };
+
+// export default connect(state=>{
+//     return {templates:state.templates};
+// })(JSTemplateGenerator);
+
+export default JSTemplateGenerator;

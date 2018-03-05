@@ -5,7 +5,6 @@ import RouteSideContainer from "../../components/RouteSideContainer";
 import {HashRouter, Route, Link} from 'react-router-dom'
 import ApiDriver from "./api-driver/ApiDriver";
 import SystemSetting from "../SystemSetting";
-import TemplateDriver from "./template-driver/TemplateDriver";
 import JSTemplate from "./template-driver/JSTemplate";
 import TemplateManager from "./template-driver/TemplateManager";
 import RealTimeCompiler from "./RealTimeCompiler";
@@ -30,14 +29,12 @@ export default class WebViews extends BaseComponent {
                 ]}
                 content={
                     [
-                        <Route exact path={url + "/"} component={TemplateDriver}/>,
+                        <Route exact path={url + "/"} component={TemplateManager}/>,
+                        <Route exact path={url + "/template-manager"} component={TemplateManager}/>,
                         <Route exact path={url + "/real-time-compiler"} component={RealTimeCompiler}/>,
-                        <Route exact path={url + "/remote-view"} component={TemplateDriver}/>,
-                        <Route exact path={url + "/template-driver"} component={TemplateDriver}/>,
                         <Route exact path={url + "/template-driver/js-template"} component={JSTemplate}/>,
                         <Route exact path={url + "/template-driver/js-template/:uri"} component={JSTemplate}/>,
                         <Route exact path={url + "/api-driver"} component={ApiDriver}/>,
-                        <Route exact path={url + "/template-manager"} component={TemplateManager}/>,
                         <Route exact path={url + "/system-setting"} component={SystemSetting}/>
                     ]
                 }
