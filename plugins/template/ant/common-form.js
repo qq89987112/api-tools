@@ -68,7 +68,8 @@ function a() {
                                         })
                                     }
                                     
-                                    resetParams(){
+                                    resetForm(){
+                                        this.$setFormValue({});
                                         this.setState({
                                             ${className2}:undefined
                                         })
