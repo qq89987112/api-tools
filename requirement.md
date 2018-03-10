@@ -20,7 +20,10 @@
 添加模板开发时的模板实时编译。
 添加返回的json全局搜索的功能(方便临时快速找到相应的返回内容。)。
 添加本地模板文件夹地址,提供mini窗口搜索 以及 快捷键路径设置。
-写一个局域网的JSONResult,方便查看手机的网络请求和分离JSONResult代码（手机上的浏览器也可以运行JSONResult拦截）。
+
+JSONResult:
+    1、写一个局域网的JSONResult,方便查看手机的网络请求和分离JSONResult代码（手机上的浏览器也可以运行JSONResult拦截）。
+    2、多倍JSONResult中的数组个数
 
 
 
