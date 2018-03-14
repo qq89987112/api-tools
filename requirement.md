@@ -25,6 +25,9 @@ JSONResult:
     1、写一个局域网的JSONResult,方便查看手机的网络请求和分离JSONResult代码（手机上的浏览器也可以运行JSONResult拦截）。
     2、多倍JSONResult中的数组个数
 
+1、更改使用快捷键控制内容。（modal弹出框）
+2、以单独显示器为上下文。
+
 
 
 
