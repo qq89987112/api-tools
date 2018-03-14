@@ -14,7 +14,7 @@ let createWindow = () => {
         alwaysOnTop:true
     });
     global.mainWindow = mainWindow;
-    mainWindow.loadURL(`${global.baseURL}/#/remove-views/mini`);
+    mainWindow.loadURL(`${global.baseURL}/#/`);
 
     if(global.NODE_ENV === `development`){
         //打开控制台

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Popover,Form,Input,Button,Select} from 'antd'
-import BaseComponent from "../../../../components/Base/BaseComponent";
+import BaseComponent from "./Base/BaseComponent";
 
 
 export default class QuickPropover extends BaseComponent {

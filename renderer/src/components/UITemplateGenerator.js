@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Form, Input, Button, message} from 'antd'
 import 'antd/dist/antd.css';
-import BaseComponent from "../../../../components/Base/BaseComponent";
-import Requestor from "../../api-driver/components/Requestor";
-import QuickPropover from "../../api-driver/components/QuickPropover";
-import JSONResult from "../../../../components/JSONResult";
+import BaseComponent from "./Base/BaseComponent";
+import Requestor from "./Requestor";
+import QuickPropover from "./QuickPropover";
+import JSONResult from "./JSONResult";
 
 
 export default class UITemplateGenerator extends BaseComponent {

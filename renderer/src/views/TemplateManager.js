@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {Table,Button,Input} from 'antd'
 import 'antd/dist/antd.css';
-import BaseComponent from "../../../components/Base/BaseComponent";
-import ModalWrapper from "../../../components/Base/ModalWrapper";
-import PopoverWrapper from "../../../components/Base/PopoverWrapper";
-import JSTemplateGenerator from "./components/JSTemplateGenerator";
+import BaseComponent from "../components/Base/BaseComponent";
+import ModalWrapper from "../components/Base/ModalWrapper";
+import PopoverWrapper from "../components/Base/PopoverWrapper";
+import JSTemplateGenerator from "../components/JSTemplateGenerator";
 import { connect } from 'react-redux'
-import TemplateUploadBox from "./components/TemplateUploadBox";
+import TemplateUploadBox from "../components/TemplateUploadBox";
 const { clipboard } = window.require('electron');
 
 

@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import { Layout, Input, Breadcrumb, Button,Tree  } from 'antd';
-import BaseComponent from "../../../components/Base/BaseComponent";
+import BaseComponent from "../components/Base/BaseComponent";
 import 'antd/dist/antd.css';
 import "./css/OverviewBrowser.scss"
-import {RouteTabs} from "../../../components/TabSideContainer";
-import serverSideJquery from "../../../js/server-side-jquery"
-import {MTree} from "../../../components/MTree";
-import Utils from "../../../js/Utils";
+import {RouteTabs} from "../components/TabSideContainer";
+import serverSideJquery from "../js/server-side-jquery"
+import {MTree} from "../components/MTree";
+import Utils from "../js/Utils";
 const { Header, Content, Footer, Sider } = Layout;
 const TreeNode = Tree.TreeNode;
 

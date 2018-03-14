@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
-import BaseComponent from "../../../components/Base/BaseComponent";
-import JSTemplateGenerator from "./components/JSTemplateGenerator";
-import TemplateShortcut from "../../../remote-main/TemplateShortcut";
+import BaseComponent from "../components/Base/BaseComponent";
+import JSTemplateGenerator from "../components/JSTemplateGenerator";
+import {Shortcut} from "../store/reducers/shortcut";
 const { clipboard,remote } = window.require('electron');
 
 export default class JSTemplate extends BaseComponent {
@@ -15,7 +15,7 @@ export default class JSTemplate extends BaseComponent {
                 template:template.template||''
             })
         }
-        TemplateShortcut.onShortcut((shortcut,template)=>{
+        Shortcut.onShortcut((shortcut,template)=>{
             setState(template);
         })
         //

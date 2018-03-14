@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
-import BaseComponent from "../../../components/Base/BaseComponent";
-import AutoCompleteWrapper from "../../../components/AutoCompleteWrapper";
+import BaseComponent from "../components/Base/BaseComponent";
+import AutoCompleteWrapper from "../components/AutoCompleteWrapper";
 
 const {remote} = window.require('electron');
 const glob = remote.require("glob");

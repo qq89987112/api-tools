@@ -1,4 +1,4 @@
-import TemplateShortcut from "../../../remote-main/TemplateShortcut";
+import {Shortcut} from "./shortcut";
 
 let templates = JSON.parse(localStorage.templates||'[]');
 
@@ -22,7 +22,7 @@ export default function (state = templates,action){
             ;
     }
 
-    TemplateShortcut.reLoad();
+    Shortcut.reLoad();
     localStorage.templates = JSON.stringify(state)
     return state;
 };
