@@ -82,23 +82,38 @@ class BaseComponent extends React.Component {
         }
     }
 
-    wrapLoadMoreEx(api,name,params){
-            const
-                context = this,
-                loadingWrapper = this.wrapLoading(api, name, name),
-                loadingMoreWrapper = this.wrapLoadMore(loadingWrapper, params);
-            return loadingMoreWrapper.reLoad().then((data) => {
-                    context[name+"LoadMore"] = loadingMoreWrapper;
-                    context.setState({
-                        [`${name}Pagi`]: {
-                            total: data.totalCount,
-                            onChange: (page, pageSize) => setTimeout(() => loadingMoreWrapper.loadPage(page), 0)
-                        },
-                        [`${name}Reload`]: loadingMoreWrapper.reLoad
-                    })
-                    return data;
-                }
-            )
+    wrapReadLoad(api,name,params,loadingName){
+        loadingName&&this.$load(loadingName);
+        return api(params).then(data=>{
+            loadingName&&this.$cancel(loadingName);
+            let loadMore = this[`${name}LoadMore`];
+            loadMore&&loadMore.reLoadPage();
+            return data;
+        })
+    }
+
+    wrapLoadMoreEx(api,name,params,{auto=true}={}){
+        const
+            context = this,
+            loadingWrapper = this.wrapLoading(api, name, name),
+            loadingMoreWrapper = this.wrapLoadMore(loadingWrapper, params),
+            reLoad = loadingMoreWrapper.reLoad,
+            pageSize = params&&params.rows||10;
+
+        loadingMoreWrapper.reLoad = (...params)=>{
+            return reLoad(...params).then((data) => {
+                context.setState({
+                    [`${name}Pagi`]: {
+                        total: data.totalCount,
+                        pageSize,
+                        onChange: (page, pageSize) => setTimeout(() => loadingMoreWrapper.loadPage(page), 0)
+                    }
+                })
+                return data;
+            })
+        }
+        context[name+"LoadMore"] = loadingMoreWrapper;
+        return auto&&loadingMoreWrapper.reLoad()
     }
 
 
@@ -136,8 +151,7 @@ class BaseComponent extends React.Component {
     }
 
 
-    //form表单相关
-    $formCheck(...params) {
+    formCheck(params,context){
         return params.find(item => {
             const
                 name = item[0],
@@ -145,13 +159,13 @@ class BaseComponent extends React.Component {
                 test = item[1],
                 error = item[2];
             if (test instanceof Function) {
-                if (!test(this.__form_value__[name])) {
+                if (!test(context[name])) {
                     message.error(error);
                     //中断循环
                     return true;
                 }
             } else if (test instanceof RegExp) {
-                if (!test.test(this.__form_value__[name])) {
+                if (!test.test(context[name])) {
                     message.error(error);
                     //中断循环
                     return true;
@@ -161,6 +175,12 @@ class BaseComponent extends React.Component {
             }
         })
     }
+
+    //form表单相关
+    $formCheck(...params) {
+        return this.formCheck(params,this.__form_value__);
+    }
+
 
     __form_value__ = {}
     $onInput = (name, realTime) => {
@@ -187,6 +207,10 @@ class BaseComponent extends React.Component {
 
     }
 
+    $setFormValue(form={}){
+        this.__form_value__ = form;
+    }
+
     $setInputValue = (name, value) => {
         const
             form = this.__form_value__;
@@ -204,7 +228,7 @@ class BaseComponent extends React.Component {
             )
         }
         else {
-            return form[names];
+            return names ? form[names] : form;
         }
     }
 
@@ -221,7 +245,7 @@ class BaseComponent extends React.Component {
         message.success(error);
     }
 
-    
+
     // loading相关
     $load = (name) => {
         let

@@ -12,7 +12,8 @@ class JSTemplateGenerator extends BaseComponent {
         let {template,onSubmit,dispatch} = this.props,
             parameters = {},
             defaultValues = template.params||{},
-            orginTemplate = template;
+            orginTemplate = template,
+            compileResult;
 
         if(!template.template) return <div>模板为空！</div>
 
@@ -23,10 +24,9 @@ class JSTemplateGenerator extends BaseComponent {
         Object.entries(defaultValues).forEach(item=>{
             this.$setInputValue(item[0],item[1]);
         })
-
         try{
-            template = eval(`(${template.template})`)();
-            parameters = template.parameters;
+            compileResult = eval(`(${template.template})`)();
+            parameters = compileResult.parameters;
         }catch(e){
             console.error(e);
             return <div/>
@@ -73,10 +73,11 @@ class JSTemplateGenerator extends BaseComponent {
                         return prev;
                     },{})
                     try{
-                        let result = template.compile(form);
+                        let result = compileResult.compile(form);
                         //
+                        debugger
+                        clipboard.writeText(result);
 
-                        clipboard.writeText(result.result);
                         this.toast("已复制到剪贴板。");
 
 
@@ -85,11 +86,11 @@ class JSTemplateGenerator extends BaseComponent {
                             params:originForm,
                             template:orginTemplate
                         };
-                        dispatch(template);
                         onSubmit&&onSubmit(template);
                     }catch (e){
                         message.error("编译出错！");
                         // 在此处，进行控制台调试
+                        console.error(e);
                         console.error(form);
                     }
 

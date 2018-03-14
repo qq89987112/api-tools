@@ -1,4 +1,4 @@
-import {Shortcut} from "./shortcut";
+import {Shortcut} from "./shortcuts";
 
 let templates = JSON.parse(localStorage.templates||'[]');
 

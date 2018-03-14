@@ -6,11 +6,10 @@ import store from '../store'
 import SystemSetting from "./SystemSetting";
 import TemplateManager from "./TemplateManager";
 import RealTimeCompiler from "./RealTimeCompiler";
-import JSTemplate from "./JSTemplate";
 import ApiDriver from "./ApiDriver";
 import Mini from "./Mini";
 import OverviewBrowser from "./OverviewBrowser";
-import {Shortcut} from "../store/reducers/shortcut";
+import {Shortcut} from "../store/reducers/shortcuts";
 
 class App extends Component {
 
@@ -26,8 +25,6 @@ class App extends Component {
                         <Route exact path="/" component={SystemSetting}/>
                         <Route exact path="/template-manager" component={TemplateManager}/>
                         <Route exact path="/real-time-compiler" component={RealTimeCompiler}/>
-                        <Route exact path="/template-driver/js-template" component={JSTemplate}/>
-                        <Route exact path="/template-driver/js-template/:uri" component={JSTemplate}/>
                         <Route exact path="/api-driver" component={ApiDriver}/>
                         <Route exact path="/system-setting" component={SystemSetting}/>
                         <Route exact path='/overview-browser' component={OverviewBrowser}/>

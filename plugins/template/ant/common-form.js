@@ -31,10 +31,9 @@ function a() {
                                 //    ModalWrapper.$show(({instance})=><${className}
                                 //    onSubmit={(params,control)=>{
                                 //        control.load();
-                                //        this.wrapReadLoad(add,name).then(()=>{
-                                //            control.cancel();
-                                //            instance.close();
-                                //        })
+                                //        this.wrapReadLoad(add,statename,params).then(()=>{
+                                //                instance.close();
+                                //            }).catch(()=>control.cancel())
                                 //    }} />)} type='primary'>新增</Button>
                                 // 更新 
                                 //<Button onClick={()=>ModalWrapper.$show(({instance})=>
@@ -42,15 +41,14 @@ function a() {
                                 //    ${className2}={record}
                                 //    onSubmit={(params,control)=>{
                                 //    control.load();
-                                //    update(Object.assign({id:record.id},params))
-                                //        .catch(()=>{
-    //
-                                //        }).
-                                //        then(()=>{
-                                //        control.cancel();
-                                //        instance.close()
-                                //        reLoad()
-                                //    })}} />)} type='primary'>修改</Button>
+                                //   this.wrapReadLoad(update,statename,{id:record.id,...params})
+                                //                    .catch(()=>{
+//
+                                //                    }).
+                                //                then(()=>{
+                                //                    control.cancel();
+                                //                    instance.close();
+                                //                })}} />)} type='primary'>修改</Button>
                                 // defaultValue.+?} 
                                 export default class ${className} extends BaseComponent {
 

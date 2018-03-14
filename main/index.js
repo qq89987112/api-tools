@@ -8,10 +8,10 @@ let createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        frame: false,
-        transparent: true,
+        // frame: false,
+        // transparent: true,
         webPreferences: {webSecurity: false},
-        alwaysOnTop:true
+        // alwaysOnTop:true
     });
     global.mainWindow = mainWindow;
     mainWindow.loadURL(`${global.baseURL}/#/`);

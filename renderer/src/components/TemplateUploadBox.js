@@ -19,11 +19,7 @@ export default class TemplateUploadBox extends BaseComponent {
         fr.readAsText(file);
         fr.onload = () =>{
             let template = fr.result;
-            ModalWrapper.$showNew(({instance})=><JSTemplateGenerator onSubmit={template=>{
-                onSubmit(template);
-                instance.close();
-            }
-            } template={template}/>,{footer:null,width:'80%'})
+            onSubmit(template);
         }
     }
     render() {

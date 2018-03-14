@@ -1,4 +1,7 @@
+import React from "react"
 import { createHashHistory as createHistory } from "history";
+import ModalWrapper from "../../components/Base/ModalWrapper";
+import JSTemplateGenerator from "../../components/JSTemplateGenerator";
 
 let shortcuts = JSON.parse(localStorage.shortcuts||'[]');
 const {remote} = window.require('electron')
@@ -27,8 +30,20 @@ export class Shortcut {
                 // mainWindow.restore();
                 globalShortcut.unregister(key);
                 globalShortcut.register(key,()=>{
-                    Shortcut.history.push("/template-driver/js-template",item);
-                    Shortcut.shortcutListener(key,item);
+                    ModalWrapper.$show(()=>{
+                        let result = <div>{key}没有对应匹配的内容</div>;
+                        switch(item.type){
+                            case "模板跳转":
+                                result = <JSTemplateGenerator  onSubmit={result=>{
+
+                                }
+                                } template={item.params}/>;
+                                break;
+                            default:
+                                break;
+                        }
+                        return result;
+                    })
                 });
             }
         })
@@ -38,14 +53,13 @@ export default function (state = shortcuts,action){
     let shortcut;
     switch(action.type){
         case "SHORTCUT_ADD":
-            shortcut = action.shortcut;
-            state = shortcut ? state.concat(shortcut) : state;
-            break;
         case "TEMPLATE_UPDATE":
             shortcut = action.shortcut;
             const index = shortcuts.findIndex(t=>t.key===shortcut.key);
             if (~index) {
                 shortcuts[index] = shortcut;
+            }else{
+                shortcuts = state.concat(shortcut);
             }
             state = [...shortcuts];
             break;
@@ -53,7 +67,7 @@ export default function (state = shortcuts,action){
             ;
     }
 
-    localStorage.templates = JSON.stringify(state)
+    localStorage.shortcuts = JSON.stringify(state)
     Shortcut.reLoad();
     return state;
 };
