@@ -12,7 +12,7 @@ const {globalShortcut} = remote.require('electron');
 
 export class Shortcut {
     static history = createHistory();
-    static shortcutListener = ()=>{}
+    static shortcutF12Listener = ()=>{}
     // url
     // params
     // template
@@ -20,12 +20,13 @@ export class Shortcut {
 
     }
 
-    static onShortcut(listener){
-        Shortcut.shortcutListener = listener;
+    static onF12Shortcut(listener){
+        Shortcut.shortcutF12Listener = listener;
     }
 
     static reLoad(){
         const shortcuts = JSON.parse(localStorage.shortcuts||'[]');
+        globalShortcut.register("F12",this.onF12Shortcut);
         shortcuts.forEach(item=>{
             let key = item.key;
             if(key){
