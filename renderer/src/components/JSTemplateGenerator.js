@@ -9,7 +9,7 @@ const { clipboard } = window.require('electron');
 class JSTemplateGenerator extends BaseComponent {
 
     render() {
-        let {template,onSubmit,dispatch} = this.props,
+        let {template,onSubmit,context} = this.props,
             parameters = {},
             defaultValues = template.params||{},
             orginTemplate = template,
@@ -73,7 +73,7 @@ class JSTemplateGenerator extends BaseComponent {
                         return prev;
                     },{})
                     try{
-                        let result = compileResult.compile(form);
+                        let result = compileResult.compile(form,context);
                         //
                         debugger
                         clipboard.writeText(result);
@@ -84,7 +84,8 @@ class JSTemplateGenerator extends BaseComponent {
                         let template = {
                             location:this.$getInputValue("location"),
                             params:originForm,
-                            template:orginTemplate
+                            template:orginTemplate,
+                            result
                         };
                         onSubmit&&onSubmit(template);
                     }catch (e){

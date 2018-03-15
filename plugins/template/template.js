@@ -7,7 +7,11 @@ function template() {
         requestLib:{
 
         },
-        compile(params) {
+        //放在文件夹里时有用
+        events:{
+
+        },
+        compile(params,context) {
             const {code=''} = params;
             return `
 function template() {
