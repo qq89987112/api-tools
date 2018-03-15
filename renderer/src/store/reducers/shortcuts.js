@@ -6,7 +6,7 @@ import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
 
-let shortcuts = JSON.parse(localStorage.shortcuts||'[]');
+
 const {remote} = window.require('electron')
 const {globalShortcut} = remote.require('electron');
 
@@ -67,19 +67,37 @@ export class Shortcut {
         })
     }
 }
-export default function (state = shortcuts,action){
+
+/**
+ *
+ * @param state
+ *  [
+ *      {
+ *          key,
+ *          type,
+ *          params
+ *      }
+ *  ]
+ * @param action
+ * @returns {any}
+ */
+export default function (state = JSON.parse(localStorage.shortcuts||'[]'),action){
     let shortcut;
     switch(action.type){
+        // 当快捷键组改变时,使用这个action
+        case "SHORTCUT_RESET":
+            state = action.shortcuts;
+            break;
         case "SHORTCUT_ADD":
-        case "TEMPLATE_UPDATE":
+        case "SHORTCUT_UPDATE":
             shortcut = action.shortcut;
-            const index = shortcuts.findIndex(t=>t.key===shortcut.key);
+            const index = state.findIndex(t=>t.key===shortcut.key);
             if (~index) {
-                shortcuts[index] = shortcut;
+                state[index] = shortcut;
             }else{
-                shortcuts = state.concat(shortcut);
+                state = state.concat(shortcut);
             }
-            state = [...shortcuts];
+            state = [...state];
             break;
         default:
             ;

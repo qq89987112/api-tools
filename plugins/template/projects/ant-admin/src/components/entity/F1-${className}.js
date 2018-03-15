@@ -2,10 +2,10 @@ function a() {
 
     return {
         parameters:{
-                className: String,
-                labels: Array,
-                fields: Array,
-                fieldValids: Array,
+            className: String,
+            labels: Array,
+            fields: Array,
+            fieldValids: Array,
         },
         requestLib:{
 

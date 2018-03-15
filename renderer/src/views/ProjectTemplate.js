@@ -81,9 +81,27 @@ class JsFileManager{
 
     }
 
+    getChildren(dir){
+        if (fs.statSync(dir).isDirectory()) {
+            const files = fs.readdirSync(dir);
+            return files.map(item=>{
+                let address = path.join(dir,item);
+                let children = this.getChildren(address);
+                return Object.assign(Array.isArray(children) ? {children} : {},{
+                    name:item,
+                    title:item,
+                    path: address
+                })
+            });
+        }else{
+            return dir;
+        }
+    }
+
     parse(path){
+        let newVar = this.files = this.getChildren(path);
         debugger
-     return this.files;
+        return newVar;
     }
 }
 
@@ -111,11 +129,12 @@ class ProjectTemplate extends BaseComponent {
 
             if (item.children) {
                 return (
-                    <Tree.TreeNode title={item.name} key={item.key} dataRef={item}>
+                    <Tree.TreeNode title={item.title} key={item.key} dataRef={item}>
                         {this.renderTreeNodes(item.children,item.key)}
                     </Tree.TreeNode>
                 );
             }
+
             return <Tree.TreeNode {...item} dataRef={item} />;
         });
     }
