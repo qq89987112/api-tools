@@ -2,6 +2,9 @@ import React from "react"
 import { createHashHistory as createHistory } from "history";
 import ModalWrapper from "../../components/Base/ModalWrapper";
 import JSTemplateGenerator from "../../components/JSTemplateGenerator";
+import {Views} from "../../views";
+import store from "../index";
+import {Provider} from 'react-redux'
 
 let shortcuts = JSON.parse(localStorage.shortcuts||'[]');
 const {remote} = window.require('electron')
@@ -31,19 +34,34 @@ export class Shortcut {
                 globalShortcut.unregister(key);
                 globalShortcut.register(key,()=>{
                     ModalWrapper.$show(()=>{
-                        let result = <div>{key}没有对应匹配的内容</div>;
+                        let result = <div>{key} 对应类型暂未实现</div>;
+                        let params = item.params;
                         switch(item.type){
                             case "模板跳转":
                                 result = <JSTemplateGenerator  onSubmit={result=>{
 
                                 }
-                                } template={item.params}/>;
+                                } template={params}/>;
+                                break;
+                            case "页面跳转":
+                                const Component = Views.find(i=>i.path===params.path);
+                                try{
+                                    params = JSON.parse(params.params);
+                                    result = Component ? <Component.component  {...params}/> :  <div>页面跳转：所指定的path {params.path} 找不到对应的组件</div>;
+                                }catch (e){
+                                    console.error(e);
+                                    result = <div>页面跳转：参数{params.params} JSON.parse 出错</div>
+                                }
+
+
                                 break;
                             default:
                                 break;
                         }
-                        return result;
-                    })
+                        return <Provider store={store}>
+                            {result}
+                        </Provider>;
+                    },{width:"90%",footer:null})
                 });
             }
         })

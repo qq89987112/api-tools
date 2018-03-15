@@ -14,6 +14,7 @@ let createWindow = () => {
         // alwaysOnTop:true
     });
     global.mainWindow = mainWindow;
+    mainWindow.maximize();
     mainWindow.loadURL(`${global.baseURL}/#/`);
 
     if(global.NODE_ENV === `development`){

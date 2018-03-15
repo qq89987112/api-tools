@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Table,Button,Input} from 'antd'
+import {Table,Button,Tree} from 'antd'
 import 'antd/dist/antd.css';
 import BaseComponent from "../components/Base/BaseComponent";
 import { connect } from 'react-redux'
 import ModalWrapper from "../components/Base/ModalWrapper";
 import JSTemplateGenerator from "../components/JSTemplateGenerator";
 import preference from "../js/preference";
+import {AsyncTree} from "../components/AsyncTree";
 const {remote } = window.require('electron');
 const glob = remote.require("glob");
 const fs = remote.require("fs");
@@ -74,30 +75,57 @@ class JSFile {
 
 class JsFileManager{
 
-    files = {
-
-    }
+    files = []
 
     notify(path,events,params,{deep=true}){
 
     }
 
-    parse(dir){
-    //
+    parse(path){
+        debugger
+     return this.files;
     }
 }
 
+
+/**
+ * 通过主页设置跳转参数来获取打开的文件夹地址
+ */
 class ProjectTemplate extends BaseComponent {
 
     componentWillMount() {
+        const {path} = this.props;
+        this.jsFileManager = new JsFileManager();
+        this.setState({
+            files: this.jsFileManager.parse(path)
+        })
+    }
+
+    renderTreeNodes = (data,path="") => {
+        return data.map((item,index) => {
+            item = {...item};
+            let path2 = path.split("-");
+            path2.push(index);
+            path2 = path2.filter(i=>i===0||i);
+            item.key = path2.join("-");
+
+            if (item.children) {
+                return (
+                    <Tree.TreeNode title={item.name} key={item.key} dataRef={item}>
+                        {this.renderTreeNodes(item.children,item.key)}
+                    </Tree.TreeNode>
+                );
+            }
+            return <Tree.TreeNode {...item} dataRef={item} />;
+        });
     }
 
     render() {
-        const {templates,dispatch} = this.props;
+        const {files} = this.state;
         return (
-            <div>
-
-            </div>
+            <Tree showLine loadData={this.onLoadData}>
+                {this.renderTreeNodes(files)}
+            </Tree>
         );
     }
 };

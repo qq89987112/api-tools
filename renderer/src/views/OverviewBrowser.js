@@ -5,7 +5,7 @@ import 'antd/dist/antd.css';
 import "./css/OverviewBrowser.scss"
 import {RouteTabs} from "../components/TabSideContainer";
 import serverSideJquery from "../js/server-side-jquery"
-import {MTree} from "../components/MTree";
+import {AsyncTree} from "../components/AsyncTree";
 import Utils from "../js/Utils";
 const { Header, Content, Footer, Sider } = Layout;
 const TreeNode = Tree.TreeNode;
@@ -62,7 +62,7 @@ export default class OverviewBrowser extends BaseComponent {
               </Header>
               <Layout>
                   <Sider className="slider">
-                      <MTree
+                      <AsyncTree
                           data={[{
                               title:'title',
                               key:'key',

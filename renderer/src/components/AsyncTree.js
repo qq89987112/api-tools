@@ -12,7 +12,7 @@ const TreeNode = Tree.TreeNode;
 *
 *   }} />
 * */
-export class MTree extends React.Component {
+export class AsyncTree extends React.Component {
     state = {
         treeData: [],
     }

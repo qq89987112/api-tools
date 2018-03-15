@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
-import { HashRouter,Route,Link } from 'react-router-dom'
-import { Provider } from 'react-redux'
+import {HashRouter, Route, Link} from 'react-router-dom'
+import {Provider} from 'react-redux'
 import store from '../store'
 import SystemSetting from "./SystemSetting";
 import TemplateManager from "./TemplateManager";
@@ -10,30 +10,62 @@ import ApiDriver from "./ApiDriver";
 import Mini from "./Mini";
 import OverviewBrowser from "./OverviewBrowser";
 import {Shortcut} from "../store/reducers/shortcuts";
+import ProjectTemplate from "./ProjectTemplate";
 
-class App extends Component {
 
-    componentWillMount(){
+/**
+ * 传参都通过location.state传
+ */
+export const Views = [
+    {
+        path: "/template-manager",
+        component: TemplateManager
+    },
+    {
+        path: "/real-time-compiler",
+        component: RealTimeCompiler
+    },
+    {
+        path: "/api-driver",
+        component: ApiDriver
+    },
+    {
+        path: "/system-setting",
+        component: SystemSetting
+    },
+    {
+        path: '/overview-browser',
+        component: OverviewBrowser
+    },
+    {
+        path: '/project-template',
+        component: ProjectTemplate
+    },
+    {
+        path: '/mini',
+        component: Mini
+    },
+]
+
+export default class App extends Component {
+
+    componentWillMount() {
         Shortcut.reLoad();
     }
 
     render() {
         return (
             <Provider store={store}>
-                <HashRouter>
-                    <div>
-                        <Route exact path="/" component={SystemSetting}/>
-                        <Route exact path="/template-manager" component={TemplateManager}/>
-                        <Route exact path="/real-time-compiler" component={RealTimeCompiler}/>
-                        <Route exact path="/api-driver" component={ApiDriver}/>
-                        <Route exact path="/system-setting" component={SystemSetting}/>
-                        <Route exact path='/overview-browser' component={OverviewBrowser}/>
-                        <Route exact path='/mini' component={Mini}/>
-                    </div>
-                </HashRouter>
+                <SystemSetting/>
+                {/*<HashRouter>*/}
+                    {/*<div>*/}
+                        {/*<Route exact path="/" component={SystemSetting}/>*/}
+                        {/*{*/}
+                            {/*Views.map((item,index)=><Route exact key={index} path={item.path} component={item.component}/>)*/}
+                        {/*}*/}
+                    {/*</div>*/}
+                {/*</HashRouter>*/}
             </Provider>
         );
     }
-}
-
-export default App;
+};

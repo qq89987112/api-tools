@@ -7,6 +7,8 @@ import ModalWrapper from "../components/Base/ModalWrapper";
 import {connect} from 'react-redux'
 import { Collapse } from 'antd';
 import TemplateUploadBox from "../components/TemplateUploadBox";
+import {Views} from "../views"
+
 const Panel = Collapse.Panel;
 class ShortcutEdit extends BaseComponent {
     render() {
@@ -23,16 +25,17 @@ class ShortcutEdit extends BaseComponent {
                 name:'页面跳转',
                 params:[{
                     name:'地址',
-                    filed:"url",
-                    type:String
+                    filed:"path",
+                    type:"route"
                 },{
                     name:'参数',
                     filed:'params',
-                    type:String
+                    type:Object
                 }]
             },
 
-        ];
+        ],
+        shortcuts = Array(11).fill(0).map((item,index)=>`F${index+1}`);
         const {selected} = this.state;
         const {onSubmit=()=>{}} = this.props;
         return <Form layout='inline' onSubmit={e => {
@@ -45,7 +48,15 @@ class ShortcutEdit extends BaseComponent {
                 onSubmit({key,type:types[selected].name,params:rest});
             }
         }}>
-            <Form.Item label='快捷键'><Input onInput={this.$onInput('key')}/></Form.Item>
+            <Form.Item label='快捷键'>
+                <Select style={{width:120}} onChange={v=>{
+                    this.$setInputValue('key',v)
+                }}>
+                    {
+                        shortcuts.map((item,index)=><Select.Option value={item}>{item}</Select.Option>)
+                    }
+                </Select>
+            </Form.Item>
             <Form.Item label='类型'>
                 <Select style={{width:120}} onChange={v=>{
                     this.setState({'selected':v})
@@ -60,6 +71,14 @@ class ShortcutEdit extends BaseComponent {
                 selected!==undefined&&types[selected].params.map(item=><Form.Item label={item.name}>
                     {
                         item.type === String &&<Input onInput={this.$onInput(item.filed)}/> ||
+                        item.type === Object &&<Input.TextArea placeholder='请填写JSON' onInput={this.$onInput(item.filed)}/> ||
+                        item.type === 'route' &&<Select style={{width:120}} onChange={v=>{
+                            this.$setInputValue(item.filed,v)
+                        }}>
+                            {
+                                Views.map((item,index)=><Select.Option title={item.path} value={item.path}>{item.path}</Select.Option>)
+                            }
+                        </Select> ||
                         item.type === "template" &&<TemplateUploadBox onSubmit={v=>this.$setInputValue(item.filed,v)}/>
                     }
                 </Form.Item>)
@@ -76,14 +95,11 @@ class SystemSetting extends BaseComponent {
         this.settings = preference.getSetting();
     }
 
-    loadPage(page, pageSize = 10) {
 
-    }
 
     render() {
         const settings = this.settings;
-        const {dataSource} = this.state;
-        const {dispatch} = this.props;
+        const {dispatch,shortcuts} = this.props;
         return <Form onSubmit={e => {
             e.preventDefault();
             preference.setSetting(this.settings)
@@ -102,22 +118,24 @@ class SystemSetting extends BaseComponent {
             <Form.Item {...FormUtils.formItemLayout(1)} label='模板文件夹'><Input defaultValue={settings.templateDir} onInput={this.$onInput(v => settings.templateDir = v)}/></Form.Item>
             <Form.Item {...FormUtils.formItemLayout(1)} label='查看'>
                 <Collapse bordered={false}>
-                    <Panel header={<p>快捷键 <Button onClick={() => ModalWrapper.$showNew(({instance}) =>
-                        <ShortcutEdit
-                            onSubmit={params => {
-                                dispatch({
-                                    type:"SHORTCUT_ADD",
-                                    shortcut:params
-                                });
-                                instance.close();
-                                this.loadPage(1);
-                            }}/>)}>新增</Button></p>}>
+                    <Panel header={<p>快捷键 <Button onClick={(e) => {
+                        e.stopPropagation();
+                        ModalWrapper.$showNew(({instance}) =>
+                            <ShortcutEdit
+                                onSubmit={params => {
+                                    dispatch({
+                                        type:"SHORTCUT_ADD",
+                                        shortcut:params
+                                    });
+                                    instance.close();
+                                }}/>)
+                    }}>新增</Button></p>}>
                         <Table
-                            dataSource={dataSource}
+                            dataSource={shortcuts}
                             columns={[
-                                {title: '快捷键', key: 'key'},
-                                {title: '类型', key: 'type'},
-                                {title: '数据', key: 'data'},
+                                {title: '快捷键', dataIndex: 'key'},
+                                {title: '类型', dataIndex: 'type'},
+                                {title: '数据', dataIndex: 'params',render:text=>JSON.stringify(text)},
                             ]}/>
                     </Panel>
                 </Collapse></Form.Item>
