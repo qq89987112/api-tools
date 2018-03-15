@@ -44,7 +44,6 @@ class ShortcutEdit extends BaseComponent {
                 const {selected,key,...rest} = this.$getInputValue();
                 onSubmit({key,type:types[selected].name,params:rest});
             }
-
         }}>
             <Form.Item label='快捷键'><Input onInput={this.$onInput('key')}/></Form.Item>
             <Form.Item label='类型'>
