@@ -10,6 +10,55 @@ import {Provider} from 'react-redux'
 const {remote} = window.require('electron')
 const {globalShortcut} = remote.require('electron');
 
+
+export const types = [
+    // {
+    //   name:'函数回调',
+    //
+    // },
+    {
+        name:'模板跳转',
+        params:[{
+            name:'模板',
+            filed:'template',
+            type:"template"
+        }],
+        render:(shortuct)=>{
+            let params = shortuct.params;
+            return <JSTemplateGenerator  onSubmit={result=>{
+
+            }
+            } template={params}/>;
+        }
+    },
+    {
+        name:'页面跳转',
+        params:[{
+            name:'地址',
+            filed:"path",
+            type:"route"
+        },{
+            name:'参数',
+            filed:'params',
+            type:Object
+        }],
+        render:(shortuct)=>{
+            let result;
+            let params = shortuct.params;
+            const Component = Views.find(i=>i.path===params.path);
+            try{
+                params = JSON.parse(params.params);
+                result = Component ? <Component.component  {...params}/> :  <div>页面跳转：所指定的path {params.path} 找不到对应的组件</div>;
+            }catch (e){
+                console.error(e);
+                result = <div>页面跳转：参数{params.params} JSON.parse 出错</div>
+            }
+            return result;
+        }
+    },
+
+];
+
 export class Shortcut {
     static history = createHistory();
     static shortcutF12Listener = ()=>{}
@@ -34,35 +83,19 @@ export class Shortcut {
                 // mainWindow.restore();
                 globalShortcut.unregister(key);
                 globalShortcut.register(key,()=>{
-                    ModalWrapper.$show(()=>{
-                        let result = <div>{key} 对应类型暂未实现</div>;
-                        let params = item.params;
-                        switch(item.type){
-                            case "模板跳转":
-                                result = <JSTemplateGenerator  onSubmit={result=>{
+                    if (item.type === "函数回调") {
+                        let cb = item.cb;
+                        cb&&cb();
+                    }else{
+                        ModalWrapper.$show(()=>{
+                            let type = types.find(i=>i.name===item.type);
+                            let result = type&&type.render(item)|| <div>{key} 对应类型暂未实现</div>;
+                            return <Provider store={store}>
+                                {result}
+                            </Provider>;
+                        },{width:"90%",footer:null})
+                    }
 
-                                }
-                                } template={params}/>;
-                                break;
-                            case "页面跳转":
-                                const Component = Views.find(i=>i.path===params.path);
-                                try{
-                                    params = JSON.parse(params.params);
-                                    result = Component ? <Component.component  {...params}/> :  <div>页面跳转：所指定的path {params.path} 找不到对应的组件</div>;
-                                }catch (e){
-                                    console.error(e);
-                                    result = <div>页面跳转：参数{params.params} JSON.parse 出错</div>
-                                }
-
-
-                                break;
-                            default:
-                                break;
-                        }
-                        return <Provider store={store}>
-                            {result}
-                        </Provider>;
-                    },{width:"90%",footer:null})
                 });
             }
         })
@@ -87,10 +120,15 @@ export class Shortcut {
 export default function (state = JSON.parse(localStorage.shortcuts||'[]'),action){
     let shortcut;
     switch(action.type){
-        // 当快捷键组改变时,使用这个action
-        case "SHORTCUT_RESET":
-            state = action.shortcuts;
+        case "SHORTCUT_RELOAD":
+            state = JSON.parse(localStorage.shortcuts||'[]');
             break;
+        // 当快捷键组改变时,使用这个action
+        case "SHORTCUT_ONCE_RESET":
+            state = action.pathShortcuts;
+            Shortcut.reLoad();
+            // 直接跳过持久化
+            return state;
         case "SHORTCUT_ADD":
         case "SHORTCUT_UPDATE":
             shortcut = action.shortcut;
@@ -105,7 +143,6 @@ export default function (state = JSON.parse(localStorage.shortcuts||'[]'),action
         default:
             ;
     }
-
     localStorage.shortcuts = JSON.stringify(state)
     Shortcut.reLoad();
     return state;

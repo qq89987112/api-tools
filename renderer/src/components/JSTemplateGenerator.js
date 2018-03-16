@@ -36,7 +36,6 @@ class JSTemplateGenerator extends BaseComponent {
         return (
             <div>
                 <p className='tar'><Requestor onResult={res=>{
-                    debugger
                 }}/></p>
                 <Form onSubmit={e=>{
                     e.preventDefault();
@@ -75,7 +74,6 @@ class JSTemplateGenerator extends BaseComponent {
                     try{
                         let result = compileResult.compile(form,context);
                         //
-                        debugger
                         clipboard.writeText(result);
 
                         this.toast("已复制到剪贴板。");

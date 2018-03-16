@@ -8,34 +8,12 @@ import {connect} from 'react-redux'
 import { Collapse } from 'antd';
 import TemplateUploadBox from "../components/TemplateUploadBox";
 import {Views} from "../views"
+import {types} from "../store/reducers/shortcuts"
 
 const Panel = Collapse.Panel;
 class ShortcutEdit extends BaseComponent {
     render() {
-        const types = [
-            {
-                name:'模板跳转',
-                params:[{
-                    name:'模板',
-                    filed:'template',
-                    type:"template"
-                }]
-            },
-            {
-                name:'页面跳转',
-                params:[{
-                    name:'地址',
-                    filed:"path",
-                    type:"route"
-                },{
-                    name:'参数',
-                    filed:'params',
-                    type:Object
-                }]
-            },
-
-        ],
-        shortcuts = Array(11).fill(0).map((item,index)=>`F${index+1}`);
+        const shortcuts = Array(11).fill(0).map((item,index)=>`F${index+1}`);
         const {selected} = this.state;
         const {onSubmit=()=>{}} = this.props;
         return <Form layout='inline' onSubmit={e => {
@@ -146,5 +124,5 @@ class SystemSetting extends BaseComponent {
 
 
 export default connect(state => {
-    return {shortcuts: state.shortcuts};
+    return {shortcuts: state.pathShortcuts};
 })(SystemSetting);

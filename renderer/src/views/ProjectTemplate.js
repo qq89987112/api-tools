@@ -11,12 +11,17 @@ const {remote } = window.require('electron');
 const glob = remote.require("glob");
 const fs = remote.require("fs");
 const path = remote.require("path");
-class JSFile {
 
-    constructor(fileAddr,parent,jsFileManager){
+
+export class Project{
+    static jsFileManager = undefined;
+};
+
+export class JSFile {
+
+    constructor(fileAddr){
         this.fileAddr = fileAddr;
-        this.parent = parent;
-        this.jsFileManager = jsFileManager;
+        this.jsFileManager = Project.jsFileManager;
         let template = this.template = fs.readFileSync(fileAddr,'utf-8');
         this.instance = eval(`(${template})`);
 
@@ -76,6 +81,7 @@ class JSFile {
 class JsFileManager{
 
     files = []
+    pathShortcuts = {}
 
     notify(path,events,params,{deep=true}){
 
@@ -87,7 +93,33 @@ class JsFileManager{
             return files.map(item=>{
                 let address = path.join(dir,item);
                 let children = this.getChildren(address);
-                return Object.assign(Array.isArray(children) ? {children} : {},{
+                let
+                    isDir = Array.isArray(children),
+                    jsFile;
+                if (!isDir) {
+                    item = item.split("=");
+                    item = item[0];
+                    const
+                        split = item.split("-"),
+                        [shortcut,group='default'] = split;
+                    if (shortcut) {
+                        /**
+                         *  F1-quick=${name}
+                         *  {
+                         *      default:{
+                         *          F1:jsFile
+                         *      }
+                         *  }
+                         *
+                         */
+                        const groups = this.pathShortcuts[dir] || {};
+                        const shortcuts = groups[group] || {};
+                        shortcuts[shortcut] = address;
+                        groups[group] = shortcuts;
+                        this.pathShortcuts[dir] = groups;
+                    }
+                }
+                return Object.assign(isDir ? {children} : {},{
                     name:item,
                     title:item,
                     path: address
@@ -99,11 +131,14 @@ class JsFileManager{
     }
 
     parse(path){
-        let newVar = this.files = this.getChildren(path);
-        debugger
-        return newVar;
+
+        return {
+            tree:this.getChildren(path),
+            pathShortcuts:this.pathShortcuts
+        };
     }
 }
+
 
 
 /**
@@ -112,10 +147,20 @@ class JsFileManager{
 class ProjectTemplate extends BaseComponent {
 
     componentWillMount() {
-        const {path} = this.props;
-        this.jsFileManager = new JsFileManager();
+        const {path,dispatch} = this.props;
+        Project.jsFileManager = new JsFileManager();
+        let {tree,pathShortcuts} = Project.jsFileManager.parse(path);
+        this.pathShortcuts = pathShortcuts;
+        let project = this.project =  {
+            path,
+            pathShortcuts
+        };
+        dispatch({
+            type:"PROJECT_ADD",
+            project
+        });
         this.setState({
-            files: this.jsFileManager.parse(path)
+            tree
         })
     }
 
@@ -140,14 +185,25 @@ class ProjectTemplate extends BaseComponent {
     }
 
     render() {
-        const {files} = this.state;
+        const {tree} = this.state;
+        const {dispatch} = this.props;
         return (
-            <Tree showLine loadData={this.onLoadData}>
-                {this.renderTreeNodes(files)}
+            <Tree showLine
+                  loadData={this.onLoadData}
+                  onSelect={(key,e)=>{
+                        this.project.activePath =  e.node.props.dataRef.path;
+
+                        dispatch({
+                            type:"PROJECT_UPDATE",
+                            project:this.project
+                        })
+                  }}
+            >
+                {this.renderTreeNodes(tree)}
             </Tree>
         );
     }
 };
 export default connect(state=>{
-    return {templates:state.templates};
+    return {projects:state.projects};
 })(ProjectTemplate);
