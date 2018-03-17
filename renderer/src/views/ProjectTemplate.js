@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table,Button,Tree} from 'antd'
+import {Form,Button,Tree,Input,message,Tag,notification} from 'antd'
 import 'antd/dist/antd.css';
 import BaseComponent from "../components/Base/BaseComponent";
 import { connect } from 'react-redux'
@@ -7,11 +7,14 @@ import ModalWrapper from "../components/Base/ModalWrapper";
 import JSTemplateGenerator from "../components/JSTemplateGenerator";
 import preference from "../js/preference";
 import {AsyncTree} from "../components/AsyncTree";
+import store from "../store";
 const {remote } = window.require('electron');
 const glob = remote.require("glob");
 const fs = remote.require("fs");
+const fse = remote.require("fs-extra");
 const path = remote.require("path");
 
+// const beautify = remote.require('js-beautify').js
 
 export class Project{
     static jsFileManager = undefined;
@@ -22,6 +25,9 @@ export class JSFile {
     constructor(fileAddr){
         this.fileAddr = fileAddr;
         this.jsFileManager = Project.jsFileManager;
+        this.relativeAddr = path.relative(this.jsFileManager.rootDir,fileAddr);
+        let tempName = fileAddr.split("\\").slice(-1)[0];
+        this.fileName = tempName.split("=")[1]||tempName;
         let template = this.template = fs.readFileSync(fileAddr,'utf-8');
         this.instance = eval(`(${template})`);
 
@@ -64,17 +70,57 @@ export class JSFile {
      * 要求和notify一致。
      */
     compile(){
-        ModalWrapper.$show(()=><JSTemplateGenerator
+        let projectAddr = preference.getSetting("projectAddr");
+        let promise = Promise.resolve();
+        if (!projectAddr) {
+            promise = new Promise((resolve,reject)=>{
+                ModalWrapper.$showNew(({instance})=> <Form layout="inline" onSubmit={e=>{
+                    e.stopPropagation();
+                    if (projectAddr) {
+                        preference.setSetting("projectAddr",projectAddr);
+                        resolve();
+                        instance.close();
+                    }else{
+                        message.error('您还没有设定目标项目地址!');
+                    }
+                }}>
+                    <Form.Item><Input placeholder='请输入目标项目地址' onInput={e=>{
+                        projectAddr = e.target.value;
+                    }} /></Form.Item>
+                    <Form.Item><Button htmlType="submit"  type='primary'>确定</Button></Form.Item>
+                </Form>,{footer:null})
+            })
+        }
+        promise.then(()=>ModalWrapper.$showNew(()=><JSTemplateGenerator
             context={this}
-            onSubmit={({result})=>{
-                let projectAddr = preference.getSetting("projectAddr");
+            onSubmit={({result,params})=>{
                 if (projectAddr) {
                     // 判断文件是否存在。
 
                     // 需要替换名字。
-                    fs.writeFileSync(path.join(projectAddr,this.fileAddr),result)
+                    let addr = path.join(projectAddr,this.relativeAddr);
+                    let className = params.className;
+                    if (className) {
+                        let splits = addr.split("\\");
+                        splits[splits.length-1] = this.fileName.replace('${className}',className)
+                        addr =  splits.join("\\");
+                        // 对jsx不友好
+                        // fse.outputFileSync(addr,beautify(result));
+                        fse.outputFileSync(addr,result);
+                        message.success(<p>已经在<Tag onClick={()=>{
+                        //    先把js的默认打开方式设置为 webstorm
+
+                        //    使用 opn 打开。
+                        }} >{addr}</Tag>生成数据！</p>);
+                    }else{
+                        message.error('请指定className!');
+                    }
+
+                }else{
+                    message.error('您还没有设定目标项目地址!');
                 }
-            }} template={{template:this.template}} />)
+            }} template={{template:this.template}} />,{width:"80%",footer:null}))
+
     }
 }
 
@@ -82,9 +128,18 @@ class JsFileManager{
 
     files = []
     pathShortcuts = {}
-
-    notify(path,events,params,{deep=true}){
-
+    rootDir = '';
+    notify(notifyPath,events,params,{deep=true}={}){
+        const addr = path.join(preference.getSetting('projectAddr'),notifyPath);
+        const list = glob.sync(addr);
+        if (list.length===0) {
+            notification.error({
+                message:"编译尾段出错",
+                description:`找不到事件${events}的通知对象${addr}`,
+                duration:null
+            });
+        }
+        debugger
     }
 
     getChildren(dir){
@@ -95,6 +150,7 @@ class JsFileManager{
                 let children = this.getChildren(address);
                 let
                     isDir = Array.isArray(children),
+                    // 这里不能用 jsFile ，因为最后会被持久化到 localStorage 中。
                     jsFile;
                 if (!isDir) {
                     item = item.split("=");
@@ -131,7 +187,7 @@ class JsFileManager{
     }
 
     parse(path){
-
+        this.rootDir = path;
         return {
             tree:this.getChildren(path),
             pathShortcuts:this.pathShortcuts
@@ -146,17 +202,19 @@ class JsFileManager{
  */
 class ProjectTemplate extends BaseComponent {
 
+    project = {};
+
     componentWillMount() {
         const {path,dispatch} = this.props;
         Project.jsFileManager = new JsFileManager();
         let {tree,pathShortcuts} = Project.jsFileManager.parse(path);
         this.pathShortcuts = pathShortcuts;
-        let project = this.project =  {
+        let project =  {
             path,
             pathShortcuts
         };
         dispatch({
-            type:"PROJECT_ADD",
+            type:"PROJECT_UPDATE",
             project
         });
         this.setState({
@@ -171,39 +229,53 @@ class ProjectTemplate extends BaseComponent {
             path2.push(index);
             path2 = path2.filter(i=>i===0||i);
             item.key = path2.join("-");
-
             if (item.children) {
                 return (
-                    <Tree.TreeNode title={item.title} key={item.key} dataRef={item}>
+                    <Tree.TreeNode title={item.title} key={item.key} className='folder' dataRef={item}>
                         {this.renderTreeNodes(item.children,item.key)}
                     </Tree.TreeNode>
                 );
             }
 
-            return <Tree.TreeNode {...item} dataRef={item} />;
+            return <Tree.TreeNode {...item} dataRef={item} className='file' />;
         });
+    }
+
+    updateProject(project){
+        const {dispatch} = this.props;
+        dispatch({
+            type:"PROJECT_UPDATE",
+            project
+        })
     }
 
     render() {
         const {tree} = this.state;
-        const {dispatch} = this.props;
+        const {project} = this.props;
         return (
-            <Tree showLine
-                  loadData={this.onLoadData}
-                  onSelect={(key,e)=>{
-                        this.project.activePath =  e.node.props.dataRef.path;
-
-                        dispatch({
-                            type:"PROJECT_UPDATE",
-                            project:this.project
-                        })
-                  }}
-            >
-                {this.renderTreeNodes(tree)}
-            </Tree>
+            <div>
+                {
+                    project&&<Tree showLine
+                                   showIcon
+                          defaultExpandedKeys={project.expandedKeys||[]}
+                          onExpand={(expandedKeys,node)=>{
+                              project.expandedKeys = expandedKeys;
+                              this.updateProject(project);
+                          }}
+                          loadData={this.onLoadData}
+                          onSelect={(key,e)=>{
+                              project.activePath =  e.node.props.dataRef.path;
+                              this.updateProject(project);
+                          }}
+                    >
+                        {this.renderTreeNodes(tree)}
+                    </Tree>
+                }
+            </div>
         );
     }
 };
-export default connect(state=>{
-    return {projects:state.projects};
+export default connect((state,props)=>{
+    let projects = state.projects;
+    return {projects,project:projects[props.path]};
 })(ProjectTemplate);

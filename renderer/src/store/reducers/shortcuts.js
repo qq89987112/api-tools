@@ -5,8 +5,9 @@ import JSTemplateGenerator from "../../components/JSTemplateGenerator";
 import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
+import {JSFile} from "../../views/ProjectTemplate";
 
-
+const { clipboard } = window.require('electron');
 const {remote} = window.require('electron')
 const {globalShortcut} = remote.require('electron');
 
@@ -26,7 +27,8 @@ export const types = [
         render:(shortuct)=>{
             let params = shortuct.params;
             return <JSTemplateGenerator  onSubmit={result=>{
-
+                clipboard.writeText(result);
+                this.toast("已复制到剪贴板。");
             }
             } template={params}/>;
         }
@@ -73,8 +75,7 @@ export class Shortcut {
         Shortcut.shortcutF12Listener = listener;
     }
 
-    static reLoad(){
-        const shortcuts = JSON.parse(localStorage.shortcuts||'[]');
+    static reLoad(shortcuts = JSON.parse(localStorage.shortcuts||'[]')){
         globalShortcut.register("F12",this.onF12Shortcut);
         shortcuts.forEach(item=>{
             let key = item.key;
@@ -117,20 +118,39 @@ export class Shortcut {
  * @param action
  * @returns {any}
  */
-export default function (state = JSON.parse(localStorage.shortcuts||'[]'),action){
+let tempShortcuts = JSON.parse(localStorage.shortcuts||'[]');
+export default function (state = tempShortcuts,action){
     let shortcut;
     switch(action.type){
+        case "PROJECT_UPDATE":
+            const {projects} = store.getState();
+            let project = action.project;
+            const tempProject = projects[project.path];
+            if (tempProject) {
+                if (project.activePath/*&&(tempProject.activePath !== project.activePath)*/) {
+                    let pathShortcuts = project.pathShortcuts;
+                    let activeGroup = tempProject.activeGroup||'default';
+                    const groupShortcuts = pathShortcuts[project.activePath];
+                    const shortcuts = groupShortcuts[activeGroup];
+                    state = Object.entries(shortcuts).map(item=>{
+                        return {
+                            type:'函数回调',
+                            key:item[0],
+                            cb:()=>{
+                                (new JSFile(item[1])).compile();
+                            }
+                        }
+                    }) || [];
+                    Shortcut.reLoad(state);
+                }
+            }
+            break;
         case "SHORTCUT_RELOAD":
             state = JSON.parse(localStorage.shortcuts||'[]');
             break;
-        // 当快捷键组改变时,使用这个action
-        case "SHORTCUT_ONCE_RESET":
-            state = action.pathShortcuts;
-            Shortcut.reLoad();
-            // 直接跳过持久化
-            return state;
         case "SHORTCUT_ADD":
         case "SHORTCUT_UPDATE":
+            state = tempShortcuts || state;
             shortcut = action.shortcut;
             const index = state.findIndex(t=>t.key===shortcut.key);
             if (~index) {
@@ -138,12 +158,12 @@ export default function (state = JSON.parse(localStorage.shortcuts||'[]'),action
             }else{
                 state = state.concat(shortcut);
             }
-            state = [...state];
+            tempShortcuts = state = [...state];
+            localStorage.shortcuts = JSON.stringify(state);
+            Shortcut.reLoad();
             break;
         default:
             ;
     }
-    localStorage.shortcuts = JSON.stringify(state)
-    Shortcut.reLoad();
     return state;
 };

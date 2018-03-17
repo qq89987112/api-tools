@@ -5,7 +5,9 @@ import BaseComponent from "./BaseComponent";
 
 // 使用方式为
 // this.$showModal(({resolve,reject,params,form})=><div></div>).then((result)=>{})
-class ModalWrapper extends BaseComponent{
+class ModalWrapper extends BaseComponent {
+
+
     static instance;
 
     static $new = (props = {footer: null}) => {
@@ -32,18 +34,15 @@ class ModalWrapper extends BaseComponent{
 
     static $showNew = (reactNodeFunc,props) => {
         let
-            $new = ModalWrapper.$new(props),
+            $new = ModalWrapper.$new({...{mask:false},...props}),
             _close = $new.close;
-            $new.close = ()=>_close({destory:true});
+        $new.close = ()=>_close({destory:true});
         return $new.show(reactNodeFunc);
     }
 
     static $show = (reactNodeFunc,props) => {
         return ModalWrapper.$getInstance(props).show(reactNodeFunc);
     }
-
-    state = {}
-
     /*
     *  当关闭modal后才出发then回调
     * */
@@ -64,13 +63,13 @@ class ModalWrapper extends BaseComponent{
                     instance: this // from 可以合并到这里
                 };
 
-                if(type==='[object Function]'){
-                    render = reactNodeFunc;
-                    onShow = ()=>{};
-                }else if(type==='[object Object]'){
-                    render = reactNodeFunc.render;
-                    onShow = reactNodeFunc.onShow || (()=>{});
-                }
+            if(type==='[object Function]'){
+                render = reactNodeFunc;
+                onShow = ()=>{};
+            }else if(type==='[object Object]'){
+                render = reactNodeFunc.render;
+                onShow = reactNodeFunc.onShow || (()=>{});
+            }
 
 
 

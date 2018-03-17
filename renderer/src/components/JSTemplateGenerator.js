@@ -73,10 +73,6 @@ class JSTemplateGenerator extends BaseComponent {
                     },{})
                     try{
                         let result = compileResult.compile(form,context);
-                        //
-                        clipboard.writeText(result);
-
-                        this.toast("已复制到剪贴板。");
 
 
                         let template = {
