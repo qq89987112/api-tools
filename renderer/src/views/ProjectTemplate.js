@@ -30,7 +30,7 @@ export class TemplateJSFile {
         let tempName = fileAddr.split("\\").slice(-1)[0];
         this.fileName = tempName.split("=")[1] || tempName;
         let template = this.template = fs.readFileSync(fileAddr, 'utf-8');
-        this.instance = eval(`(${template})`);
+        this.instance = eval(`(${template})`)();
 
     }
 
@@ -97,7 +97,8 @@ export class TemplateJSFile {
         promise.then(() => ModalWrapper.$showNew(() => <JSTemplateGenerator
             context={this}
             beforeCompile={({params}) => {
-                let promise = Promise.reject();
+                let promise = Promise.resolve();
+
                 if (projectAddr) {
                     addr = path.join(projectAddr, this.relativeAddr);
                     let className = params.className;
@@ -185,6 +186,7 @@ class JsFileManager {
         }
         // debugger
     }
+
 
     getChildren(dir) {
         if (fs.statSync(dir).isDirectory()) {

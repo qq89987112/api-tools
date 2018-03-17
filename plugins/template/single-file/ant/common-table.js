@@ -8,13 +8,20 @@ function a() {
                 dataIndexs:Array
             },
         events:{
-          "form-generated":(params,{projectAddr,context,fse,glob,path})=>{
-              let arr = glob(path.join(projectAddr,"src/views/**Page.js"))
-              arr.forEach(item=>{
-                  let content = fse.readFileSync(item);
-                  content.replace(new RegExp('/*<Form.Item> <Button htmlType=\'submit\' type=\'primary\'>新增</Button></Form.Item>*/'))
-              })
-          }
+            "form-generated":(params,{projectAddr,context,fse,glob,path})=>{
+                let arr = glob(path.join(projectAddr,"src/views/**Page.js"))
+                arr.forEach(item=>{
+                    let content = fse.readFileSync(item,"utf-8");
+                    content = content.replace(/(\/\*<Form.Item><Button htmlType='submit' type='primary'>新增<\/Button><\/Form.Item>\*\/)/,
+                        (match,extart)=>{
+                            return match.replace(extart,params.add)
+                        }).replace(/\{title:'操作':render:\(\)=><p>(\/\*<Button>修改<\/Button>\*\/)<p>\}/,
+                        (match,extart)=>{
+                            return match.replace(extart,params.update)
+                        })
+                    fse.outputFileSync(item,content);
+                })
+            }
         },
         compile(params) {
             const {columns, className,headers,dataIndexs} = params;
@@ -42,16 +49,17 @@ export default class ${className} extends BaseComponent{
                             this.${className2}LoadMore.reLoad(this.$getInputValue([${headers.map(i=>`"${i}"`)}]));
                         }}>
                             ${
-                                headers.map(i=>`<Form.Item><Input onInput={this.$onInput('${i}')}/></Form.Item>`).join('\r\n')
-                            }
-                            /*<Form.Item> <Button htmlType='submit' type='primary'>新增</Button></Form.Item>*/
+                headers.map(i=>`<Form.Item><Input onInput={this.$onInput('${i}')}/></Form.Item>`).join('\r\n')
+                }
+                            /*<Form.Item><Button htmlType='submit' type='primary'>新增</Button></Form.Item>*/
                             <Form.Item> <Button htmlType='submit' type='primary'>查询</Button></Form.Item>
                         </Form>
                     </div>}
                     columns={[
                         ${
-                            columns.map((i,index)=>`{title: "${i}", dataIndex: '${dataIndexs[index]}',},`).join("\r\n")
-                        }
+                columns.map((i,index)=>`{title: "${i}", dataIndex: '${dataIndexs[index]}',},`).join("\r\n")
+                }
+                        {title:'操作':render:()=><p>/*<Button>修改</Button>*/<p>}
                     ]}
                     dataSource={this.state.${className2}}
                     loading={this.$isLoading("${className2}")}
