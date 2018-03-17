@@ -1,6 +1,6 @@
 import {Shortcut} from "./shortcuts";
 import store from "../index"
-import {JSFile} from "../../views/ProjectTemplate";
+import {TemplateJSFile} from "../../views/ProjectTemplate";
 /**
  * {
  *    // 项目地址
@@ -9,6 +9,7 @@ import {JSFile} from "../../views/ProjectTemplate";
  *       activePath:'',
  *       activeGroup:'',
  *       expandedKeys:[],
+ *       selectedKey:,
  *       pathShortcuts:{
  *          group:{
  *              F1:jsfile

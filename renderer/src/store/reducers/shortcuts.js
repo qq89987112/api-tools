@@ -5,7 +5,7 @@ import JSTemplateGenerator from "../../components/JSTemplateGenerator";
 import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
-import {JSFile} from "../../views/ProjectTemplate";
+import {TemplateJSFile} from "../../views/ProjectTemplate";
 
 const { clipboard } = window.require('electron');
 const {remote} = window.require('electron')
@@ -127,22 +127,25 @@ export default function (state = tempShortcuts,action){
             let project = action.project;
             const tempProject = projects[project.path];
             if (tempProject) {
-                if (project.activePath/*&&(tempProject.activePath !== project.activePath)*/) {
+                if (tempProject.activePath/*&&(tempProject.activePath !== project.activePath)*/) {
                     let pathShortcuts = project.pathShortcuts;
                     let activeGroup = tempProject.activeGroup||'default';
-                    const groupShortcuts = pathShortcuts[project.activePath];
-                    const shortcuts = groupShortcuts[activeGroup];
+                    const groupShortcuts = pathShortcuts[tempProject.activePath]||{};
+                    const shortcuts = groupShortcuts[activeGroup]||[];
                     state = Object.entries(shortcuts).map(item=>{
                         return {
                             type:'函数回调',
                             key:item[0],
                             cb:()=>{
-                                (new JSFile(item[1])).compile();
+                                (new TemplateJSFile(item[1])).compile();
                             }
                         }
                     }) || [];
-                    Shortcut.reLoad(state);
+                }else{
+                    state = tempShortcuts;
                 }
+
+                Shortcut.reLoad(state);
             }
             break;
         case "SHORTCUT_RELOAD":

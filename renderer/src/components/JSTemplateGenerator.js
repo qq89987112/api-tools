@@ -9,7 +9,7 @@ const { clipboard } = window.require('electron');
 class JSTemplateGenerator extends BaseComponent {
 
     render() {
-        let {template,onSubmit,context} = this.props,
+        let {template,beforeCompile=()=>Promise.resolve(),onSubmit,context} = this.props,
             parameters = {},
             defaultValues = template.params||{},
             orginTemplate = template,
@@ -72,16 +72,16 @@ class JSTemplateGenerator extends BaseComponent {
                         return prev;
                     },{})
                     try{
-                        let result = compileResult.compile(form,context);
-
-
                         let template = {
                             location:this.$getInputValue("location"),
                             params:originForm,
                             template:orginTemplate,
-                            result
                         };
-                        onSubmit&&onSubmit(template);
+                        beforeCompile(template).then(()=>{
+                            template.result = compileResult.compile(form, context);
+                            onSubmit&&onSubmit(template);
+                        })
+
                     }catch (e){
                         message.error("编译出错！");
                         // 在此处，进行控制台调试

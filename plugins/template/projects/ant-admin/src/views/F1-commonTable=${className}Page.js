@@ -7,15 +7,6 @@ function a() {
                 headers:Array,
                 dataIndexs:Array
             },
-        events:{
-          "form-generated":(params,{projectAddr,context,fse,glob,path})=>{
-              let arr = glob(path.join(projectAddr,"src/views/**Page.js"))
-              arr.forEach(item=>{
-                  let content = fse.readFileSync(item);
-                  content.replace(new RegExp('/*<Form.Item> <Button htmlType=\'submit\' type=\'primary\'>新增</Button></Form.Item>*/'))
-              })
-          }
-        },
         compile(params) {
             const {columns, className,headers,dataIndexs} = params;
             const className2 = className.replace(/^\S/,s=>s.toLowerCase());
@@ -44,7 +35,6 @@ export default class ${className} extends BaseComponent{
                             ${
                                 headers.map(i=>`<Form.Item><Input onInput={this.$onInput('${i}')}/></Form.Item>`).join('\r\n')
                             }
-                            /*<Form.Item> <Button htmlType='submit' type='primary'>新增</Button></Form.Item>*/
                             <Form.Item> <Button htmlType='submit' type='primary'>查询</Button></Form.Item>
                         </Form>
                     </div>}

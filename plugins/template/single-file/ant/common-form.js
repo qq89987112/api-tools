@@ -2,10 +2,10 @@ function a() {
 
     return {
         parameters:{
-                className: String,
-                labels: Array,
-                fields: Array,
-                fieldValids: Array,
+            className: String,
+            labels: Array,
+            fields: Array,
+            fieldValids: Array,
         },
         requestLib:{
 
@@ -86,7 +86,7 @@ function a() {
                                 }
             `;
 
-            context&&context.notify(`/src/views/*/${className}*.js`,"form-generated",{
+            context&&context.notify(`/src/views/**/${className}**.js`,"form-generated",{
                 add:`<Button onClick={()=>
                        ModalWrapper.$show(({instance})=><${className}
                        onSubmit={(params,control)=>{

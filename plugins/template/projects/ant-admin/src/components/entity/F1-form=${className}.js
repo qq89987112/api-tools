@@ -86,7 +86,7 @@ function a() {
                                 }
             `;
 
-            context&&context.notify(`/src/views/*/${className}*.js`,"form-generated",{
+            context&&context.notify(`/src/views/F1-commonTable=$\{className\}Page.js`,"form-generated",{
                 add:`<Button onClick={()=>
                        ModalWrapper.$show(({instance})=><${className}
                        onSubmit={(params,control)=>{

@@ -34,14 +34,14 @@ class ModalWrapper extends BaseComponent {
 
     static $showNew = (reactNodeFunc,props) => {
         let
-            $new = ModalWrapper.$new({...{mask:false},...props}),
+            $new = ModalWrapper.$new({...{mask:false,footer:null},...props}),
             _close = $new.close;
         $new.close = ()=>_close({destory:true});
         return $new.show(reactNodeFunc);
     }
 
     static $show = (reactNodeFunc,props) => {
-        return ModalWrapper.$getInstance(props).show(reactNodeFunc);
+        return ModalWrapper.$getInstance({...{footer:null},...props}).show(reactNodeFunc);
     }
     /*
     *  当关闭modal后才出发then回调

@@ -124,5 +124,5 @@ class SystemSetting extends BaseComponent {
 
 
 export default connect(state => {
-    return {shortcuts: state.pathShortcuts};
+    return {shortcuts: state.shortcuts};
 })(SystemSetting);
