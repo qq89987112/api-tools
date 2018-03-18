@@ -1,4 +1,5 @@
 import React from "react"
+import {message} from "antd"
 import { createHashHistory as createHistory } from "history";
 import ModalWrapper from "../../components/Base/ModalWrapper";
 import JSTemplateGenerator from "../../components/JSTemplateGenerator";
@@ -26,9 +27,9 @@ export const types = [
         }],
         render:(shortuct)=>{
             let params = shortuct.params;
-            return <JSTemplateGenerator  onSubmit={result=>{
+            return <JSTemplateGenerator  onSubmit={({result})=>{
                 clipboard.writeText(result);
-                this.toast("已复制到剪贴板。");
+                message.success("已复制到剪贴板。");
             }
             } template={params}/>;
         }

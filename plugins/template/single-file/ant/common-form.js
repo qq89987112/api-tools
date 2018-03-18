@@ -93,7 +93,7 @@ function a() {
                            control.load();
                            this.wrapReadLoad(add,statename,params).then(()=>{
                                    instance.close();
-                               }).catch(()=>control.cancel())
+                               }).catch(()=>{}).then(()=>control.cancel())
                        }} />)} type='primary'>新增</Button>`,
                 update:`<Button onClick={()=>ModalWrapper.$show(({instance})=>
                             <${className}
