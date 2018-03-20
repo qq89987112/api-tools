@@ -1,0 +1,19 @@
+.dynamic-list-component{
+  .dynamic-list-item + .dynamic-list-item{
+    margin-top: 10px;
+  }
+  .dynamic-list-item{
+    position: relative;
+    padding-right: 20px;
+
+    .icon{
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+    }
+  }
+  .footer{
+    margin-top: 10px;
+  }
+}
