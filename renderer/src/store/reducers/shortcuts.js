@@ -12,12 +12,15 @@ const { clipboard } = window.require('electron');
 const {remote} = window.require('electron')
 const {globalShortcut} = remote.require('electron');
 
-
+// 目前支持的params 请全局搜索 elected!==undefined&&types[selected].params.map(item=><Form.Item label={item.name}>
+//
 export const types = [
-    // {
-    //   name:'函数回调',
-    //
-    // },
+    {
+      name:'临时模板',
+      params:[{
+        name:''
+      }]
+    },
     {
         name:'模板跳转',
         params:[{

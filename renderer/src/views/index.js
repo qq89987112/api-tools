@@ -41,8 +41,12 @@ export const Views = [
         path: '/project-template',
         component: ProjectTemplate
     },
+    // {
+    //     path: '/mini',
+    //     component: Mini
+    // },
     {
-        path: '/mini',
+        path: '/temporary-template',
         component: Mini
     },
 ]
