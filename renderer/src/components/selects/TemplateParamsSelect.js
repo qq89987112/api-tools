@@ -12,7 +12,7 @@ const TreeNode = Tree.TreeNode;
 *
 *   }} />
 * */
-export class AsyncTree extends React.Component {
+export class TemplateParamsSelect extends React.Component {
     state = {
         treeData: [],
     }
