@@ -6,14 +6,14 @@ import preference from "../js/preference";
 import ModalWrapper from "../components/Base/ModalWrapper";
 import {connect} from 'react-redux'
 import { Collapse } from 'antd';
-import TemplateUploadBox from "../components/TemplateUploadBox";
+import TemplateUploadBox from "../components/template/TemplateUploadBox";
 import {Views} from "../views"
 import {types} from "../store/reducers/shortcuts"
+import ShortcutSelects from "../components/selects/ShortcutSelects";
 
 const Panel = Collapse.Panel;
 class ShortcutEdit extends BaseComponent {
     render() {
-        const shortcuts = Array(11).fill(0).map((item,index)=>`F${index+1}`);
         const {selected} = this.state;
         const {onSubmit=()=>{}} = this.props;
         return <Form layout='inline' onSubmit={e => {
@@ -27,13 +27,9 @@ class ShortcutEdit extends BaseComponent {
             }
         }}>
             <Form.Item label='快捷键'>
-                <Select style={{width:120}} onChange={v=>{
+                <ShortcutSelects  onChange={v=>{
                     this.$setInputValue('key',v)
-                }}>
-                    {
-                        shortcuts.map((item,index)=><Select.Option value={item}>{item}</Select.Option>)
-                    }
-                </Select>
+                }}/>
             </Form.Item>
             <Form.Item label='类型'>
                 <Select style={{width:120}} onChange={v=>{

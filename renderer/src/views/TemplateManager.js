@@ -4,9 +4,9 @@ import 'antd/dist/antd.css';
 import BaseComponent from "../components/Base/BaseComponent";
 import ModalWrapper from "../components/Base/ModalWrapper";
 import PopoverWrapper from "../components/Base/PopoverWrapper";
-import JSTemplateGenerator from "../components/JSTemplateGenerator";
+import JSTemplateGenerator from "../components/template/JSTemplateGenerator";
 import { connect } from 'react-redux'
-import TemplateUploadBox from "../components/TemplateUploadBox";
+import TemplateUploadBox from "../components/template/TemplateUploadBox";
 const { clipboard } = window.require('electron');
 
 

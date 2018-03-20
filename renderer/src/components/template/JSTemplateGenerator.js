@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {Form,Input,Button,message} from 'antd'
 import 'antd/dist/antd.css';
-import BaseComponent from "./Base/BaseComponent";
-import Requestor from "./Requestor";
+import BaseComponent from "../Base/BaseComponent";
+import Requestor from "../Requestor";
 import { connect } from 'react-redux'
 const { clipboard } = window.require('electron');
 

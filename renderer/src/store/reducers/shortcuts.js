@@ -2,7 +2,7 @@ import React from "react"
 import {message} from "antd"
 import { createHashHistory as createHistory } from "history";
 import ModalWrapper from "../../components/Base/ModalWrapper";
-import JSTemplateGenerator from "../../components/JSTemplateGenerator";
+import JSTemplateGenerator from "../../components/template/JSTemplateGenerator";
 import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
@@ -15,12 +15,6 @@ const {globalShortcut} = remote.require('electron');
 // 目前支持的params 请全局搜索 elected!==undefined&&types[selected].params.map(item=><Form.Item label={item.name}>
 //
 export const types = [
-    {
-      name:'临时模板',
-      params:[{
-        name:''
-      }]
-    },
     {
         name:'模板跳转',
         params:[{
@@ -53,7 +47,7 @@ export const types = [
             let params = shortuct.params;
             const Component = Views.find(i=>i.path===params.path);
             try{
-                params = JSON.parse(params.params);
+                params = JSON.parse(params.params||'{}');
                 result = Component ? <Component.component  {...params}/> :  <div>页面跳转：所指定的path {params.path} 找不到对应的组件</div>;
             }catch (e){
                 console.error(e);

@@ -11,32 +11,34 @@ import Mini from "./Mini";
 import OverviewBrowser from "./OverviewBrowser";
 import {Shortcut} from "../store/reducers/shortcuts";
 import ProjectTemplate from "./ProjectTemplate";
+import TemporaryTemplate from "./TemporaryTemplate";
+import SnippetsGenerator from "./SnippetsGenerator";
 
 
 /**
  * 传参都通过location.state传
  */
 export const Views = [
-    {
-        path: "/template-manager",
-        component: TemplateManager
-    },
-    {
-        path: "/real-time-compiler",
-        component: RealTimeCompiler
-    },
-    {
-        path: "/api-driver",
-        component: ApiDriver
-    },
-    {
-        path: "/system-setting",
-        component: SystemSetting
-    },
-    {
-        path: '/overview-browser',
-        component: OverviewBrowser
-    },
+    // {
+    //     path: "/template-manager",
+    //     component: TemplateManager
+    // },
+    // {
+    //     path: "/real-time-compiler",
+    //     component: RealTimeCompiler
+    // },
+    // {
+    //     path: "/api-driver",
+    //     component: ApiDriver
+    // },
+    // {
+    //     path: "/system-setting",
+    //     component: SystemSetting
+    // },
+    // {
+    //     path: '/overview-browser',
+    //     component: OverviewBrowser
+    // },
     {
         path: '/project-template',
         component: ProjectTemplate
@@ -47,7 +49,11 @@ export const Views = [
     // },
     {
         path: '/temporary-template',
-        component: Mini
+        component: TemporaryTemplate
+    },
+    {
+        path: '/snippets-generator',
+        component: SnippetsGenerator
     },
 ]
 

@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import BaseComponent from "../components/Base/BaseComponent";
 import {connect} from 'react-redux'
 import ModalWrapper from "../components/Base/ModalWrapper";
-import JSTemplateGenerator from "../components/JSTemplateGenerator";
+import JSTemplateGenerator from "../components/template/JSTemplateGenerator";
 import preference from "../js/preference";
 import {AsyncTree} from "../components/AsyncTree";
 import store from "../store";
