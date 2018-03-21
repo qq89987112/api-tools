@@ -47,7 +47,7 @@ JSONResult:
 
 
 # 2018-3-20
-    1、添加一个 autoComplete 的 模板页跳转  记录notyfy(可以等有需要的文件被创建后再重发一次。可以通过FileSystemComponent组件重新选择发送目标。) 以及扫描  项目slot
+    1、记录notyfy(可以等有需要的文件被创建后再重发一次。可以通过FileSystemComponent组件重新选择发送目标。) 以及扫描  项目slot
     2、添加一个 可以运行预设的模版组合次数等
     3、添加一个 SnippetsGenerator(不管布局和交互)，用于快速将上一级的文字写出来。不生成页面，只复制到剪贴板。
         1、像有赞一样，读取模板参数自动生成右侧参数控制表单。
