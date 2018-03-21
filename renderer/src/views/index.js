@@ -4,15 +4,12 @@ import {HashRouter, Route, Link} from 'react-router-dom'
 import {Provider} from 'react-redux'
 import store from '../store'
 import SystemSetting from "./SystemSetting";
-import TemplateManager from "./TemplateManager";
-import RealTimeCompiler from "./RealTimeCompiler";
-import ApiDriver from "./ApiDriver";
-import Mini from "./Mini";
 import OverviewBrowser from "./OverviewBrowser";
 import {Shortcut} from "../store/reducers/shortcuts";
 import ProjectTemplate from "./ProjectTemplate";
-import TemporaryTemplate from "./TemporaryTemplate";
+import TemporaryTemplate from "./SnippetsMaker";
 import SnippetsGenerator from "./SnippetsGenerator";
+import SnippetsMaker from "./SnippetsMaker";
 
 
 /**
@@ -20,40 +17,24 @@ import SnippetsGenerator from "./SnippetsGenerator";
  */
 export const Views = [
     // {
-    //     path: "/template-manager",
-    //     component: TemplateManager
-    // },
-    // {
-    //     path: "/real-time-compiler",
-    //     component: RealTimeCompiler
-    // },
-    // {
-    //     path: "/api-driver",
-    //     component: ApiDriver
-    // },
-    // {
-    //     path: "/system-setting",
-    //     component: SystemSetting
-    // },
-    // {
     //     path: '/overview-browser',
     //     component: OverviewBrowser
     // },
     {
-        path: '/project-template',
+        path: '项目模板',
         component: ProjectTemplate
     },
-    // {
-    //     path: '/mini',
-    //     component: Mini
-    // },
     {
-        path: '/temporary-template',
+        path: '临时模板',
         component: TemporaryTemplate
     },
     {
-        path: '/snippets-generator',
+        path: 'snippets生成',
         component: SnippetsGenerator
+    },
+    {
+        path: 'snippets制作',
+        component: SnippetsMaker
     },
 ]
 

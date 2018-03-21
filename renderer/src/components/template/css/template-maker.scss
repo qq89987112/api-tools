@@ -1,0 +1,9 @@
+.template-maker{
+  display: flex;
+  .maker{
+    flex: 1;
+  }
+  pre{
+    @extend .maker;
+  }
+}
