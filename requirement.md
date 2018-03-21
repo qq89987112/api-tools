@@ -34,10 +34,8 @@ JSONResult:
 - 新增一键打开程序。
 - 新增默认按键,之一：
     1、界面布局构造工具，可扫描指定文件夹下的模板，可发送，接收事件。
-    2、如何让模板文件可以预览？
-    3、可扫描还未被赋值的slot
+    2、可扫描还未被赋值的slot
 
-主题：当上一级产物是开源代码时，高效的转换过程是怎样的？如何让工具辅佐之？
 - 目标操作
     1、当用户选择一个文件夹时，将会读取改文件夹下的快捷键+模板。比如
         F1-${className}-page.js
@@ -58,15 +56,15 @@ JSONResult:
 
 
 
+参考：
+    https://juejin.im/post/5aae4fb16fb9a028ca52c1bc
 
+    Vue
+    https://github.com/L-Chris/vue-design
+    https://github.com/QingWei-Li/vuep vue模板文件实时预览
+    https://github.com/jaweii/Vue-Layout 基于UI组件的Vue可视化布局工具
+    https://github.com/furioussoul/esview 除基本功能外，结合了后端进行组件上传/下载功能，代码质量相对高点
 
-//根据！生活中！草稿纸生成布局代码,实时编译测试，可以提供给模板生成器生成。
-//    痛点： ui页面管理繁琐 => 纸质管理。
-//        即使
-//
-//     可能没啥用。
-//     新的操作套路：把UI 相对位置和元素画在纸上，然后递送给模板生成器来生成。
-//
-//     tesseract.js
-//     tracking.js
-//     postcss grid-kiss 插件
+    React
+    https://github.com/alibaba/ice 飞冰 - 海量可复用物料，通过 GUI 工具极速构建中后台应用
+    https://github.com/ascoders/gaea-editor 作者对编辑器的实现有比较深入的研究，可以去了解下
