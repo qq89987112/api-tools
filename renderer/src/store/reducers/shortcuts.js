@@ -7,7 +7,7 @@ import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
 import {TemplateJSFile} from "../../views/ProjectTemplate";
-import clipboardMan from "../../js/back/clipboardMan"
+import clipboardMan from "../../js/clipboardMan"
 
 const { clipboard } = window.require('electron');
 const {remote} = window.require('electron')
