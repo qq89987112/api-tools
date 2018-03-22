@@ -7,6 +7,7 @@ import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
 import {TemplateJSFile} from "../../views/ProjectTemplate";
+import clipboardMan from "../../js/back/clipboardMan"
 
 const { clipboard } = window.require('electron');
 const {remote} = window.require('electron')
@@ -16,7 +17,8 @@ const {globalShortcut} = remote.require('electron');
 //
 export const types = [
     {
-
+        name:'clipboard-man',
+        cb:clipboardMan
     },
     {
         name:'模板跳转',
@@ -89,13 +91,18 @@ export class Shortcut {
                         let cb = item.cb;
                         cb&&cb();
                     }else{
-                        ModalWrapper.$show(()=>{
-                            let type = types.find(i=>i.name===item.type);
-                            let result = type&&type.render(item)|| <div>{key} 对应类型暂未实现</div>;
-                            return <Provider store={store}>
-                                {result}
-                            </Provider>;
-                        },{width:"90%",footer:null})
+                        let type = types.find(i=>i.name===item.type);
+                        let render = type && type.render;
+                        let cb = type && type.cb;
+                        if(render){
+                            ModalWrapper.$show(()=>{
+                                let result = render(item)|| <div>{key} 对应类型暂未实现</div>;
+                                return <Provider store={store}>
+                                    {result}
+                                </Provider>;
+                            },{width:"90%",footer:null})
+                        }
+                        cb&&cb();
                     }
 
                 });
