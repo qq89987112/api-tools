@@ -16,6 +16,9 @@ const {globalShortcut} = remote.require('electron');
 //
 export const types = [
     {
+
+    },
+    {
         name:'模板跳转',
         params:[{
             name:'模板',
