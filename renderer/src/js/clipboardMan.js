@@ -32,7 +32,11 @@ export default function () {
         lineReg = /\S+/g,
         templateReg = /(\S+)\?/,
         line,
-        commands = [];
+        commands = [],
+        //运行上下文
+        context = {
+
+        };
 
     while (line = lineReg.exec(content)){
         line = line[1];
