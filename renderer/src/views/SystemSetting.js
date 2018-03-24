@@ -42,7 +42,7 @@ class ShortcutEdit extends BaseComponent {
                 </Select>
             </Form.Item>
             {
-                selected!==undefined&&types[selected].params.map(item=><Form.Item label={item.name}>
+                selected!==undefined&&(types[selected].params||[]).map(item=><Form.Item label={item.name}>
                     {
                         item.type === String &&<Input onInput={this.$onInput(item.filed)}/> ||
                         item.type === Object &&<Input.TextArea placeholder='请填写JSON' onInput={this.$onInput(item.filed)}/> ||

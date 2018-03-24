@@ -1,5 +1,10 @@
-const {clipboard,remote} = window.require('electron');
-const robot = remote.require("robotjs");
+import {TemplateJSFile} from "../views/ProjectTemplate";
+
+const {clipboard, remote} = window.require('electron');
+const glob = remote.require("glob").sync;
+const fse = remote.require("fs-extra");
+// const robot = remote.require("robotjs");
+// const ks = remote.require("node-key-sender");
 
 export default function () {
     // SideContainer?p=路演管理，公司管理，人员管理，审批管理&i=icon-right,icon-other
@@ -26,16 +31,18 @@ export default function () {
 //                                       2、setEnv?$projectAddr&D:\code\github\api-tools
 
 
+    // ks.sendKeys(['a', 'b', 'c']);
+
+
     // 每一行都可以解析成对象
     const
         templates = [],
-        tempClipboard = clipboard.readText(),
-        content = clipboard.readText();
+        clipboardContent = clipboard.readText();
     let
         lineReg = /\S+/g,
         templateReg = /(\S+)\?/,
         line,
-        command = {
+        commandOption = {
             // 循环中的第一个就是command名，其他是big params, 可以通过 .modifier 是否存在来判断是否有modifier。
             // Table:{
             //     modifier:'file',
@@ -49,51 +56,71 @@ export default function () {
         };
 
     //  第一行是命令,第二行开始
-    while (line = lineReg.exec(content)){
+    while (line = lineReg.exec(clipboardContent)) {
         line = line[0];
         let
-            templateNameStr = templateReg.exec(line)[1],
-            [name,modifier] = templateNameStr.split("."),
+            templateNameStr = templateReg.exec(line);
+        if (!templateNameStr) {
+            console.error('读不到函数名字', line);
+            break;
+        }
+        let
+            [name, modifier] = templateNameStr[1].split("."),
             tempParams,
-            params = JSON.parse(JSON.stringify({modifier,rest:[]}));
-            command[name]= params;
+            params = JSON.parse(JSON.stringify({modifier, rest: []}));
+        commandOption[name] = params;
 
 
-            line = line.replace(templateNameStr[0],"");
-            templateNameStr = templateNameStr[1];
-            tempParams = line.split("&");
+        line = line.replace(templateNameStr[0], "");
+        tempParams = line.split("&");
 
-                // 获取参数
-             tempParams.reduce((prev,cur)=>{
-                    cur = cur.split("=");
-                    let [name,value] = cur;
+        // 获取参数
+        tempParams.reduce((prev, cur) => {
+            cur = cur.split("=");
+            let [name, value] = cur;
+            let originValue = value;
+            if (!value) {
+                value = name;
+                name = undefined;
+            }
 
-                    if (!value) {
-                        value = name;
-                        name = undefined;
-                    }
+            //将 a,b,c 变为数组
+            value = value.split(/[,，]/).map(i => {
+                // 获取参数的修饰器
+                const [name, modifier] = i.split(".")
+                return modifier ? {
+                    name,
+                    modifier
+                } : name
+            });
+            if (value.length <= 1) {
+                value = value[0];
+            }
 
-                    //将 a,b,c 变为数组
-                    value = value.split(",").map(i=>{
-                        // 获取参数的修饰器
-                        const [name,modifier] = i.split(".")
-                        return  modifier ? {
-                            name,
-                            modifier
-                        } : name
-                    });
-                    if(value.length<=1){
-                        value =  value[0];
-                    }
-
-                    if (!value) {
-                        prev.rest.push(value);
-                    }else{
-                        let [tempName,modifier] = name.split(".");
-                        prev[tempName] = modifier ? {modifier,value} : value;
-                    }
-                     return prev
-                },params);
+            if (!originValue) {
+                prev.rest = prev.rest.concat(value);
+            } else {
+                let [tempName, modifier] = name.split(".");
+                prev[tempName] = modifier ? {modifier, value} : value;
+            }
+            return prev
+        }, params);
     }
-
+    console.log(commandOption);
+    let entries = Object.entries(commandOption);
+    let [commandName, commandParams] = entries[0];
+    let fileAddr = `D:\\code\\github\\api-tools\\plugins\\template\\single-file\\ant\\${commandName}.js`;
+    if (fse.existsSync(fileAddr)) {
+        let jsFile = new TemplateJSFile(fileAddr);
+        let parameters = jsFile.instance.parameters;
+        let useParams = {modifier:commandParams.modifier};
+        for (let name of parameters) {
+            let value = commandParams[name];
+            if (value) {
+                useParams[name] = value;
+            }else{
+                useParams[name] = commandParams.rest.shift();
+            }
+        }
+    }
 }

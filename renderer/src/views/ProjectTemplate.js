@@ -66,11 +66,18 @@ export class TemplateJSFile {
         this.jsFileManager.notify(path, events, params, options);
     }
 
+    error(msg){
+
+    }
+
+    compile(params,context = this){
+        this.instance.compile(params,context);
+    }
 
     /**
      * 要求和notify一致。
      */
-    compile() {
+    compileInUI() {
         let projectAddr = preference.getSetting("projectAddr");
         let promise = Promise.resolve();
         if (!projectAddr) {

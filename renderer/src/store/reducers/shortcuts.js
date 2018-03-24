@@ -145,7 +145,7 @@ export default function (state = tempShortcuts,action){
                             type:'函数回调',
                             key:item[0],
                             cb:()=>{
-                                (new TemplateJSFile(item[1])).compile();
+                                (new TemplateJSFile(item[1])).compileInUI();
                             }
                         }
                     }) || [];
