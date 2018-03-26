@@ -134,5 +134,11 @@ export default function () {
         }
 
         console.log("模板参数：", templateParams);
+
+        jsFile.compile(templateParams,{
+            notify(path, events, params, options){
+
+            }
+        })
     }
 }
