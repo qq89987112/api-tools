@@ -1,8 +1,10 @@
 import {TemplateJSFile} from "../views/ProjectTemplate";
+import store from "../store"
 
 const {clipboard, remote} = window.require('electron');
 const glob = remote.require("glob").sync;
 const fse = remote.require("fs-extra");
+const path = remote.require("path");
 const child_process = remote.require("child_process");
 // const robot = remote.require("robotjs");
 // const ks = remote.require("node-key-sender");
@@ -12,7 +14,7 @@ export default function () {
     //  or SideContainer?路演管理，公司管理，人员管理，审批管理&icon-right,icon-other
     //  or $configName?路演管理，公司管理，人员管理，审批管理&icon-right,icon-other
 
-    // Form?fields=姓名，年龄，性别，职业&notify='D:\code\github\api-tools\plugins\project-templates\ant-admin\src'
+    // form?fields=姓名，年龄，性别，职业&notify='D:\code\github\api-tools\plugins\project-templates\ant-admin\src'
     //   or Form?filed=姓名，年龄，性别，职业&notify='$formDir'
     // 也可以notify当前文件
     // randomSlot => crg_add_crg
@@ -117,54 +119,90 @@ export default function () {
     if (JSON.stringify(commandOption) === '{}') {
         return;
     }
-    
+
     // 从这里开始,有了context变量。
     let
         entries = Object.entries(commandOption),
         [commandName, commandParams] = entries[0],
+        output = (msg)=>{
+            clipboard.writeText(msg);
+            child_process.execSync("wscript ./main/paste.vbs");
+        },
         context = {
-            error(msg){
-                clipboard.writeText(`error:${msg}`);
-                child_process.execSync("wscript ./main/paste.vbs");
-                clipboard.writeText(tempClipboardContent);
+            error(msg) {
+                output(`error:${msg}`);
             },
-            notify(path, events, params, options){
+            showOptionsForResult(list) {
+                output(`有多个地址,请选择其中一个：${list.join('\r\n')}`);
+                return new Promise((resolve, reject) => {
+                    let shortcuts = Array(list.length).fill("*").map((item, index) => ({
+                        key: index+1+"",
+                        type: '函数回调',
+                        cb() {
+                            store.dispatch({
+                                type: "SHORTCUT_RELOAD",
+                                shortcuts
+                            })
+                            resolve([index-1]);
+                        }
+                    }));
+
+                    store.dispatch({
+                        type: "SHORTCUT_TEMPORARY",
+                        shortcuts
+                    })
+                })
+            },
+            notify(path, events, params, options) {
 
             }
         };
 
-    // 使用glob获取,如果有多个,则paste多个选项后,监听按键事件。
-    let fileAddr = `D:\\code\\github\\api-tools\\plugins\\template\\single-file\\ant\\*${commandName}*.js`;
-    const
-        addrs = glob.sync(fileAddr);
 
-    if(!addrs.length){
+
+    // 使用glob获取,如果有多个,则paste多个选项后,监听按键事件。
+    let fileAddr = path.join("D:\\crg\\github\\api-tools\\plugins\\template\\single-file",`**/*${commandName}*.js`) ;
+
+    const
+        addrs = glob(fileAddr);
+
+
+
+    if (addrs.length) {
         let
             promise,
             addr;
         if (addrs.length > 1) {
-            
-        }else{
+            promise = context.showOptionsForResult(addrs).then(selects => addrs[selects[0]])
+        } else {
             addr = addrs[0];
             promise = Promise.resolve(addr);
         }
-    }
 
-    if (fse.existsSync(fileAddr)) {
-        let jsFile = new TemplateJSFile(fileAddr);
-        let parameters = jsFile.instance.parameters;
-        let templateParams = {modifier: commandParams.modifier};
-        for (let name of parameters) {
-            let value = commandParams[name];
-            if (value) {
-                templateParams[name] = value;
-            } else {
-                templateParams[name] = commandParams.rest.shift();
+        promise.then(addr => {
+            let jsFile = new TemplateJSFile(addr);
+            let parameters = jsFile.instance.parameters;
+            let templateParams = {modifier: commandParams.modifier};
+            for (let name of parameters) {
+                let value = commandParams[name];
+                if (value) {
+                    templateParams[name] = value;
+                } else {
+                    templateParams[name] = commandParams.rest.shift();
+                }
             }
-        }
 
-        console.log("模板参数：", templateParams);
+            console.log("模板参数：", templateParams);
 
-        jsFile.compile(templateParams,context)
+            let result = jsFile.compile(templateParams, context);
+
+
+            output(result);
+        })
+    }else{
+        context.error(`找不到命令：${commandName}`)
     }
+
+
+    clipboard.writeText(tempClipboardContent);
 }

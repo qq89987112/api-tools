@@ -80,13 +80,14 @@ export class Shortcut {
     }
 
     static reLoad(shortcuts = JSON.parse(localStorage.shortcuts || '[]')) {
+        globalShortcut.unregisterAll()
         globalShortcut.register("F12", this.onF12Shortcut);
+
         shortcuts.forEach(item => {
             let key = item.key;
             if (key) {
                 // let mainWindow = remote.getGlobal("mainWindow");
                 // mainWindow.restore();
-                globalShortcut.unregister(key);
                 globalShortcut.register(key, () => {
                     if (item.type === "函数回调") {
                         let cb = item.cb;
@@ -156,8 +157,13 @@ export default function (state = tempShortcuts, action) {
                 Shortcut.reLoad(state);
             }
             break;
+        case "SHORTCUT_TEMPORARY":
+            state = action.shortcuts;
+            Shortcut.reLoad(state);
+            break;
         case "SHORTCUT_RELOAD":
             state = JSON.parse(localStorage.shortcuts || '[]');
+            Shortcut.reLoad(state);
             break;
         case "SHORTCUT_ADD":
         case "SHORTCUT_UPDATE":

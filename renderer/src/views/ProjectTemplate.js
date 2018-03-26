@@ -70,8 +70,13 @@ export class TemplateJSFile {
 
     }
 
+    // 可以多选,返回一个 返回数组 的 promise
+    showOptionsForResult(list){
+        return Promise.resolve([1]);
+    }
+
     compile(params,context = this){
-        this.instance.compile(params,context);
+        return this.instance.compile(params,context);
     }
 
     /**
