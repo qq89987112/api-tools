@@ -117,9 +117,39 @@ export default function () {
     if (JSON.stringify(commandOption) === '{}') {
         return;
     }
-    let entries = Object.entries(commandOption);
-    let [commandName, commandParams] = entries[0];
-    let fileAddr = `D:\\code\\github\\api-tools\\plugins\\template\\single-file\\ant\\${commandName}.js`;
+    
+    // 从这里开始,有了context变量。
+    let
+        entries = Object.entries(commandOption),
+        [commandName, commandParams] = entries[0],
+        context = {
+            error(msg){
+                clipboard.writeText(`error:${msg}`);
+                child_process.execSync("wscript ./main/paste.vbs");
+                clipboard.writeText(tempClipboardContent);
+            },
+            notify(path, events, params, options){
+
+            }
+        };
+
+    // 使用glob获取,如果有多个,则paste多个选项后,监听按键事件。
+    let fileAddr = `D:\\code\\github\\api-tools\\plugins\\template\\single-file\\ant\\*${commandName}*.js`;
+    const
+        addrs = glob.sync(fileAddr);
+
+    if(!addrs.length){
+        let
+            promise,
+            addr;
+        if (addrs.length > 1) {
+            
+        }else{
+            addr = addrs[0];
+            promise = Promise.resolve(addr);
+        }
+    }
+
     if (fse.existsSync(fileAddr)) {
         let jsFile = new TemplateJSFile(fileAddr);
         let parameters = jsFile.instance.parameters;
@@ -135,10 +165,6 @@ export default function () {
 
         console.log("模板参数：", templateParams);
 
-        jsFile.compile(templateParams,{
-            notify(path, events, params, options){
-
-            }
-        })
+        jsFile.compile(templateParams,context)
     }
 }

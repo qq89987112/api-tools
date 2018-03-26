@@ -32,8 +32,7 @@ export const types = [
             return <JSTemplateGenerator onSubmit={({result}) => {
                 clipboard.writeText(result);
                 message.success("已复制到剪贴板。");
-            }
-            } template={params}/>;
+            }} template={params}/>;
         }
     },
     {
