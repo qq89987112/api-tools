@@ -3,6 +3,7 @@ import {TemplateJSFile} from "../views/ProjectTemplate";
 const {clipboard, remote} = window.require('electron');
 const glob = remote.require("glob").sync;
 const fse = remote.require("fs-extra");
+const child_process = remote.require("child_process");
 // const robot = remote.require("robotjs");
 // const ks = remote.require("node-key-sender");
 
@@ -35,9 +36,13 @@ export default function () {
 
 
     // 每一行都可以解析成对象
-    const
-        templates = [],
-        clipboardContent = clipboard.readText();
+    let
+        tempClipboardContent = clipboard.readText(),
+        clipboardContent;
+    // child_process.execSync("wscript ./main/test.vbs");
+    child_process.execSync("wscript ./main/copy.vbs");
+    clipboardContent = clipboard.readText();
+
     let
         lineReg = /\S+/g,
         templateReg = /(\S+)\?/,
@@ -107,20 +112,27 @@ export default function () {
         }, params);
     }
     console.log(commandOption);
+
+    // 开始编译
+    if (JSON.stringify(commandOption) === '{}') {
+        return;
+    }
     let entries = Object.entries(commandOption);
     let [commandName, commandParams] = entries[0];
     let fileAddr = `D:\\code\\github\\api-tools\\plugins\\template\\single-file\\ant\\${commandName}.js`;
     if (fse.existsSync(fileAddr)) {
         let jsFile = new TemplateJSFile(fileAddr);
         let parameters = jsFile.instance.parameters;
-        let useParams = {modifier:commandParams.modifier};
+        let templateParams = {modifier: commandParams.modifier};
         for (let name of parameters) {
             let value = commandParams[name];
             if (value) {
-                useParams[name] = value;
-            }else{
-                useParams[name] = commandParams.rest.shift();
+                templateParams[name] = value;
+            } else {
+                templateParams[name] = commandParams.rest.shift();
             }
         }
+
+        console.log("模板参数：", templateParams);
     }
 }
