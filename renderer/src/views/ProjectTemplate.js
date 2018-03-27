@@ -19,13 +19,21 @@ const path = remote.require("path");
 
 export class Project {
     static jsFileManager = undefined;
+    static getJsFileManager(){
+        if (!Project.jsFileManager) {
+            Project.jsFileManager = new JsFileManager();
+        }
+        return Project.jsFileManager;
+    }
 };
 
+
+// 应该弄成通过 JsFileManager new 的方式。
 export class TemplateJSFile {
 
     constructor(fileAddr) {
         this.fileAddr = fileAddr;
-        this.jsFileManager = Project.jsFileManager;
+        this.jsFileManager = Project.getJsFileManager();
         this.relativeAddr = path.relative(this.jsFileManager.templateRootDir, fileAddr);
         let tempName = fileAddr.split("\\").slice(-1)[0];
         this.fileName = tempName.split("=")[1] || tempName;
@@ -264,8 +272,7 @@ class ProjectTemplate extends BaseComponent {
 
     componentWillMount() {
         const {path, dispatch} = this.props;
-        Project.jsFileManager = new JsFileManager();
-        let {tree, pathShortcuts} = Project.jsFileManager.parse(path);
+        let {tree, pathShortcuts} = Project.getJsFileManager().parse(path);
         this.pathShortcuts = pathShortcuts;
         let project = {
             path,

@@ -1,5 +1,6 @@
 import {TemplateJSFile} from "../views/ProjectTemplate";
 import store from "../store"
+import keyboard from "./vbs/keyboard";
 
 const {clipboard, remote} = window.require('electron');
 const glob = remote.require("glob").sync;
@@ -15,7 +16,14 @@ export default function () {
     //  or $configName?路演管理，公司管理，人员管理，审批管理&icon-right,icon-other
 
     // form?fields=姓名，年龄，性别，职业&notify='D:\code\github\api-tools\plugins\project-templates\ant-admin\src'
-    //   or Form?filed=姓名，年龄，性别，职业&notify='$formDir'
+    //   or form?filed=姓名，年龄，性别，职业&notify='$formDir'
+
+    //  ===
+    //   or form.demo  => form?fields=姓名，年龄，性别，职业&notify='D:\code\github\api-tools\plugins\project-templates\ant-admin\src'
+    //  ===
+
+
+
     // 也可以notify当前文件
     // randomSlot => crg_add_crg
     // randomSlot => crg_update_crg
@@ -27,7 +35,7 @@ export default function () {
     // form.file?fields=姓名，年龄，性别，职业&output=D:\code\github\api-tools\renderer\src\js
 
 
-    // Table?column=姓名，年龄，性别，职业&operation=删除.confirm     字段后面跟点 代表附加信息，一般是类型
+    // table?column=姓名，年龄，性别，职业&operation=删除.confirm     字段后面跟点 代表附加信息，一般是类型
 
     // api?/api/base/getUserInfo.base =>
 //                                       1、您没有配置实际项目地址,请输入项目地址：$projectAddr。
@@ -47,8 +55,11 @@ export default function () {
 
     let
         lineReg = /\S+/g,
-        templateReg = /(\S+)\?/,
+        templateReg = /(?:(\S+)\?)|(?:(\S+))/,
         line,
+        variables = {
+
+        },
         commandOption = {
             // 循环中的第一个就是command名，其他是big params, 可以通过 .modifier 是否存在来判断是否有modifier。
             // Table:{
@@ -58,7 +69,13 @@ export default function () {
             //         value:'删除',
             //         modifier:'confirm'
             //     },"更新"],
-            //     rest:[]
+            //     rest:[],
+
+
+            //     其他命令
+            //     $notify:{
+            //
+            //     }
             // }
         };
 
@@ -68,9 +85,11 @@ export default function () {
         let
             templateNameStr = templateReg.exec(line);
         if (!templateNameStr) {
+
             console.error('读不到函数名字', line);
             break;
         }
+        templateNameStr = templateNameStr.filter(i=>i)
         let
             [name, modifier] = templateNameStr[1].split("."),
             tempParams,
@@ -124,34 +143,13 @@ export default function () {
     let
         entries = Object.entries(commandOption),
         [commandName, commandParams] = entries[0],
-        output = (msg)=>{
-            clipboard.writeText(msg);
-            child_process.execSync("wscript ./main/paste.vbs");
-        },
+        output = keyboard.output,
         context = {
             error(msg) {
                 output(`error:${msg}`);
             },
             showOptionsForResult(list) {
-                output(`有多个地址,请选择其中一个：${list.join('\r\n')}`);
-                return new Promise((resolve, reject) => {
-                    let shortcuts = Array(list.length).fill("*").map((item, index) => ({
-                        key: index+1+"",
-                        type: '函数回调',
-                        cb() {
-                            store.dispatch({
-                                type: "SHORTCUT_RELOAD",
-                                shortcuts
-                            })
-                            resolve([index-1]);
-                        }
-                    }));
-
-                    store.dispatch({
-                        type: "SHORTCUT_TEMPORARY",
-                        shortcuts
-                    })
-                })
+                return keyboard.options('有多个地址,请选择其中一个',list);
             },
             notify(path, events, params, options) {
 
@@ -159,13 +157,11 @@ export default function () {
         };
 
 
-
     // 使用glob获取,如果有多个,则paste多个选项后,监听按键事件。
-    let fileAddr = path.join("D:\\crg\\github\\api-tools\\plugins\\template\\single-file",`**/*${commandName}*.js`) ;
+    let fileAddr = path.join("D:\\crg\\github\\api-tools\\plugins\\template\\single-file", `**/*${commandName}*.js`);
 
     const
         addrs = glob(fileAddr);
-
 
 
     if (addrs.length) {
@@ -180,26 +176,50 @@ export default function () {
         }
 
         promise.then(addr => {
-            let jsFile = new TemplateJSFile(addr);
-            let parameters = jsFile.instance.parameters;
+
+            let template = fse.readFileSync(addr, 'utf-8');
+            template = eval(`(${template})`)();
+
+            let parameters = template.parameters;
+
+            if (commandParams.modifier === 'demo') {
+                JSON.stringify(Object.entries(parameters).map(i=>i[0]))
+                output(`${commandName}?${Object.entries(parameters).map(i=>{
+                    let example = '';
+                    switch (i[1]){
+                        case Array:
+                            example = `${i[0]}=1,2,3,4`
+                            break;
+                        case String:
+                            example = `${i[0]}=${i[0]}`
+                            break;
+                        default:
+                            break;
+                    }
+                    return example;
+                }).filter(i=>i).join("&")}`);
+                return;
+            }
+
             let templateParams = {modifier: commandParams.modifier};
-            for (let name of parameters) {
+            Object.entries(parameters).forEach(item=>{
+                let name = item[0];
                 let value = commandParams[name];
                 if (value) {
                     templateParams[name] = value;
                 } else {
                     templateParams[name] = commandParams.rest.shift();
                 }
-            }
+            })
 
             console.log("模板参数：", templateParams);
 
-            let result = jsFile.compile(templateParams, context);
+            let result = template.compile(templateParams, context);
 
 
             output(result);
         })
-    }else{
+    } else {
         context.error(`找不到命令：${commandName}`)
     }
 
