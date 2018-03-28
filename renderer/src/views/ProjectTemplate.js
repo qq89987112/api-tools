@@ -6,7 +6,6 @@ import {connect} from 'react-redux'
 import ModalWrapper from "../components/Base/ModalWrapper";
 import JSTemplateGenerator from "../components/template/JSTemplateGenerator";
 import preference from "../js/preference";
-import {AsyncTree} from "../components/AsyncTree";
 import store from "../store";
 
 const {remote} = window.require('electron');
@@ -29,7 +28,7 @@ export class Project {
 
 
 // 应该弄成通过 JsFileManager new 的方式。
-export class TemplateJSFile {
+class TemplateJSFile {
 
     constructor(fileAddr) {
         this.fileAddr = fileAddr;
@@ -71,6 +70,12 @@ export class TemplateJSFile {
     }
 
     notify(path, events, params, options) {
+        store.dispatch({
+            type:"NOTICE_ADD",
+            action:{
+                path, events, params, options
+            }
+        })
         this.jsFileManager.notify(path, events, params, options);
     }
 
@@ -172,6 +177,9 @@ class JsFileManager {
     pathShortcuts = {}
     templateRootDir = '';
 
+    static getJsFile(fileAddr){
+        return new TemplateJSFile(fileAddr);
+    }
 
     /**
      *

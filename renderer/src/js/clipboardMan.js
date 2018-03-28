@@ -11,6 +11,22 @@ const child_process = remote.require("child_process");
 // const ks = remote.require("node-key-sender");
 
 export default function () {
+
+    // 2018-3-28
+    // set?$$0=多行内容
+
+    // addTemplate?template=``                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。
+    // params?labels=Array&
+    // test?[1,2,3,4,5]
+
+    // addTemplate.demo
+
+
+    // templates
+
+
+    // 2018-02-02
+
     // SideContainer?p=路演管理，公司管理，人员管理，审批管理&i=icon-right,icon-other
     //  or SideContainer?路演管理，公司管理，人员管理，审批管理&icon-right,icon-other
     //  or $configName?路演管理，公司管理，人员管理，审批管理&icon-right,icon-other
@@ -21,7 +37,6 @@ export default function () {
     //  ===
     //   or form.demo  => form?fields=姓名，年龄，性别，职业&notify='D:\code\github\api-tools\plugins\project-templates\ant-admin\src'
     //  ===
-
 
 
     // 也可以notify当前文件
@@ -55,11 +70,10 @@ export default function () {
 
     let
         lineReg = /\S+/g,
-        templateReg = /(?:(\S+)\?)|(?:(\S+))/,
+        templateNameReg = /(?:(\S+)\?)|(?:(\S+))/,
+        noticeReg = /\$\$([0-19])/,
         line,
-        variables = {
-
-        },
+        variables = {},
         commandOption = {
             // 循环中的第一个就是command名，其他是big params, 可以通过 .modifier 是否存在来判断是否有modifier。
             // Table:{
@@ -79,22 +93,23 @@ export default function () {
             // }
         };
 
+
     //  第一行是命令,第二行开始
     while (line = lineReg.exec(clipboardContent)) {
         line = line[0];
         let
-            templateNameStr = templateReg.exec(line);
-        if (!templateNameStr) {
+            templateNameStr = templateNameReg.exec(line);
 
-            console.error('读不到函数名字', line);
-            break;
-        }
-        templateNameStr = templateNameStr.filter(i=>i)
+        templateNameStr = templateNameStr.filter(i => i)
         let
             [name, modifier] = templateNameStr[1].split("."),
             tempParams,
             params = JSON.parse(JSON.stringify({modifier, rest: []}));
         commandOption[name] = params;
+
+        // set 命令特殊,需要放在代码前头处理。
+        // 名字需要以$开头。
+        // set?$$0=asdfasd&$sc=SideContainer
 
 
         line = line.replace(templateNameStr[0], "");
@@ -119,6 +134,7 @@ export default function () {
                     modifier
                 } : name
             });
+
             if (value.length <= 1) {
                 value = value[0];
             }
@@ -149,80 +165,132 @@ export default function () {
                 output(`error:${msg}`);
             },
             showOptionsForResult(list) {
-                return keyboard.options('有多个地址,请选择其中一个',list);
+                return keyboard.options('有多个地址,请选择其中一个', list);
             },
             notify(path, events, params, options) {
-
+                // 测试时暂时这么写。
+                store.dispatch({
+                    type: "NOTICE_ADD",
+                    notice: {
+                        path, events, params, options
+                    }
+                })
             }
         };
 
 
-    // 使用glob获取,如果有多个,则paste多个选项后,监听按键事件。
-    let fileAddr = path.join("D:\\crg\\github\\api-tools\\plugins\\template\\single-file", `**/*${commandName}*.js`);
+    // 一、单独使用 $$0 的情况
+    //$$0.add
+    //$$0.update
+    // 二、使用notices查看notices列表
 
-    const
-        addrs = glob(fileAddr);
+    // 一些功能性的指令
+    let
+        regResult,
+        modifier = commandParams.modifier,
+        fileAddr;
 
 
-    if (addrs.length) {
-        let
-            promise,
-            addr;
-        if (addrs.length > 1) {
-            promise = context.showOptionsForResult(addrs).then(selects => addrs[selects[0]])
-        } else {
-            addr = addrs[0];
-            promise = Promise.resolve(addr);
+    try {
+        switch (true) {
+            case !!(regResult = noticeReg.exec(commandName)):
+                regResult = regResult[1];
+                let notice = store.getState().notices[regResult];
+
+                keyboard.output(`\r\n${modifier ? notice.params[modifier] : notice}\r\n`);
+                return;
+            case commandName === 'notices':
+                let {notices} = store.getState();
+                keyboard.output("\r\n" + notices.map((item, index) => `$$${index}：${JSON.stringify(Object.entries(item.params).reduce((prev, cur) => {
+                    prev[cur[0]] = modifier ? cur[1].slice(0, modifier) : '...';
+                    return prev;
+                }, {}))}`).join('\r\n') + "\r\n");
+                return;
+            case commandName === 'templates':
+                if (modifier === 'file') {
+                    fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/projects/**/**.js");
+                } else {
+                    fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file/**/**.js");
+                }
+                let templates = glob(fileAddr);
+                keyboard.output("\r\n" + templates.map((item, index) => `${index + 1}：${item}`).join('\r\n') + "\r\n");
+                return;
+            default:
+                break;
         }
 
-        promise.then(addr => {
+        if (modifier === 'file') {
+            fileAddr = path.join(remote.getGlobal("__dirname"), `../plugins/template/projects/**/*${commandName}*.js`);
+        } else {
+            fileAddr = path.join(remote.getGlobal("__dirname"), `../plugins/template/single-file/**/*${commandName}*.js`);
+        }
 
-            let template = fse.readFileSync(addr, 'utf-8');
-            template = eval(`(${template})`)();
+        const
+            addrs = glob(fileAddr);
 
-            let parameters = template.parameters;
 
-            if (commandParams.modifier === 'demo') {
-                JSON.stringify(Object.entries(parameters).map(i=>i[0]))
-                output(`${commandName}?${Object.entries(parameters).map(i=>{
-                    let example = '';
-                    switch (i[1]){
-                        case Array:
-                            example = `${i[0]}=1,2,3,4`
-                            break;
-                        case String:
-                            example = `${i[0]}=${i[0]}`
-                            break;
-                        default:
-                            break;
-                    }
-                    return example;
-                }).filter(i=>i).join("&")}`);
-                return;
+        if (addrs.length) {
+            let
+                promise,
+                addr;
+            if (addrs.length > 1) {
+                promise = context.showOptionsForResult(addrs).then(selects => addrs[selects[0]])
+            } else {
+                addr = addrs[0];
+                promise = Promise.resolve(addr);
             }
 
-            let templateParams = {modifier: commandParams.modifier};
-            Object.entries(parameters).forEach(item=>{
-                let name = item[0];
-                let value = commandParams[name];
-                if (value) {
-                    templateParams[name] = value;
-                } else {
-                    templateParams[name] = commandParams.rest.shift();
+            promise.then(addr => {
+
+                let template = fse.readFileSync(addr, 'utf-8');
+                template = eval(`(${template})`)();
+
+                let parameters = template.parameters;
+
+                if (commandParams.modifier === 'demo') {
+                    JSON.stringify(Object.entries(parameters).map(i => i[0]))
+                    output(`${commandName}?${Object.entries(parameters).map(i => {
+                        let example = '';
+                        switch (i[1]) {
+                            case Array:
+                                example = `${i[0]}=1,2,3,4`;
+                                break;
+                            case String:
+                                example = `${i[0]}=${i[0]}`;
+                                break;
+                            default:
+                                break;
+                        }
+                        return example;
+                    }).filter(i => i).join("&")}`);
+                    return;
                 }
+
+                let templateParams = {modifier: commandParams.modifier};
+                Object.entries(parameters).forEach(item => {
+                    let name = item[0];
+                    let value = commandParams[name];
+                    if (value) {
+                        templateParams[name] = value;
+                    } else {
+                        templateParams[name] = commandParams.rest.shift();
+                    }
+                })
+
+                console.log("模板参数：", templateParams);
+
+                let result = template.compile(templateParams, context);
+
+
+                output(result);
             })
+        } else {
+            context.error(`找不到命令：${commandName}`)
+        }
 
-            console.log("模板参数：", templateParams);
 
-            let result = template.compile(templateParams, context);
-
-
-            output(result);
-        })
-    } else {
-        context.error(`找不到命令：${commandName}`)
+        clipboard.writeText(tempClipboardContent);
+    } catch (e) {
+        context.error(e.message);
     }
-
-
-    clipboard.writeText(tempClipboardContent);
 }

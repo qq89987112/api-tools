@@ -14,7 +14,7 @@ let createWindow = () => {
         // alwaysOnTop:true
     });
     global.mainWindow = mainWindow;
-    global.dirname = __dirname;
+    global.__dirname = __dirname;
     mainWindow.maximize();
     mainWindow.loadURL(`${global.baseURL}/#/`);
 

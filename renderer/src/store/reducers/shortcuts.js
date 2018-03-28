@@ -6,8 +6,8 @@ import JSTemplateGenerator from "../../components/template/JSTemplateGenerator";
 import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
-import {TemplateJSFile} from "../../views/ProjectTemplate";
 import clipboardMan from "../../js/clipboardMan"
+import {Project} from "../../views/ProjectTemplate";
 
 const {clipboard} = window.require('electron');
 const {remote} = window.require('electron')
@@ -146,7 +146,7 @@ export default function (state = tempShortcuts, action) {
                             type: '函数回调',
                             key: item[0],
                             cb: () => {
-                                (new TemplateJSFile(item[1])).compileInUI();
+                                Project.getJsFileManager().getJsFile(item[1]).compileInUI();
                             }
                         }
                     }) || [];
