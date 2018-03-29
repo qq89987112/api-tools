@@ -17,7 +17,7 @@ export default function () {
     // set?$$0=多行内容
 
     //
-    // $template`asdf`                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。
+    // $template`asdf`?file=./vue/cell                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。 file可以输入相对路径来生成文件。   cell 这个名字参考了有赞小程序库
     // $params?labels=Array&
     // $test?[1,2,3,4,5]            // 当有test存在时,只输出测试error和成功内容，不生成文件。如果test不存在则成功时生成文件。
     // $$notify``
@@ -62,7 +62,7 @@ export default function () {
     //                             <view class="menu-item" @tap="onMenuTap('score')"><view class="iconfont icon-jifen"/><text>我的积分</text> <view class="iconfont icon-right" /></view>
     //                             <view class="menu-item" @tap="onMenuTap('account-manager')"><view class="iconfont icon-zhanghao"/><text>管理账号</text> <view class="iconfont icon-right" /></view>
     //                          </view>
-    //                         `
+    //                         `?name=
     //                      </template>
 
 
@@ -177,7 +177,8 @@ export default function () {
                 testReg = /\$test\?(.+)/,    // ? 可有可无
                 paramsResult = paramsReg.exec(clipboardContent),
                 testResult = testReg.exec(clipboardContent),
-                noticeResult = noticeReg.exec(clipboardContent);
+                noticeResult = noticeReg.exec(clipboardContent),
+                templateResult;
 
                 function toObject(paramsResult) {
                     return paramsResult[1].split("&").reduce((prev, cur) => {
@@ -199,10 +200,18 @@ export default function () {
                     templateOption.params = toObject(paramsResult);
                 }
 
-                templateMaker.make({template:templateOption.template, params:templateOption.params, defaultValues:});
+                templateResult = templateMaker.make({template:templateOption.template, params:Object.entries(templateOption.params).reduce((prev,cur)=>{
+                        return prev.concat({
+                            name:cur[0],
+                            type:cur[1]
+                        })
+                    },[]), defaultValues:templateOption.test});
+
 
 
                 if (templateOption.test) {
+                    context.output(eval(`(${templateResult})`).compile({},context));
+                }else{
 
                 }
 
