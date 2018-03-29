@@ -15,7 +15,7 @@ export default function () {
     // 2018-3-28
     // set?$$0=多行内容
 
-    // addTemplate?template=``                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。
+    // addTemplate?template=`asdf`                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。
     // params?labels=Array&
     // test?[1,2,3,4,5]
 
@@ -72,6 +72,7 @@ export default function () {
         lineReg = /\S+/g,
         templateNameReg = /(?:(\S+)\?)|(?:(\S+))/,
         noticeReg = /\$\$([0-19])/,
+        multiParamsReg = /`([^.]+?)`/g,
         line,
         variables = {},
         commandOption = {
@@ -94,22 +95,27 @@ export default function () {
         };
 
 
+    // 多行参数命令特殊,需要放在代码前头处理。
+    let index = 0;
+    clipboardContent.replace(multiParamsReg, (match, extract, index, source) => {
+        let key = `$$_${index++}`;
+        variables[key] = extract;
+        return match.replace(extract, key)
+    });
+
+
     //  第一行是命令,第二行开始
     while (line = lineReg.exec(clipboardContent)) {
         line = line[0];
         let
             templateNameStr = templateNameReg.exec(line);
 
-        templateNameStr = templateNameStr.filter(i => i)
+        templateNameStr = templateNameStr.filter(i => i);
         let
             [name, modifier] = templateNameStr[1].split("."),
             tempParams,
             params = JSON.parse(JSON.stringify({modifier, rest: []}));
         commandOption[name] = params;
-
-        // set 命令特殊,需要放在代码前头处理。
-        // 名字需要以$开头。
-        // set?$$0=asdfasd&$sc=SideContainer
 
 
         line = line.replace(templateNameStr[0], "");
@@ -214,6 +220,10 @@ export default function () {
                 }
                 let templates = glob(fileAddr);
                 keyboard.output("\r\n" + templates.map((item, index) => `${index + 1}：${item}`).join('\r\n') + "\r\n");
+                return;
+            case commandName === 'set':
+                // 名字需要以$开头。
+                // set?$$0=asdfasd&$sc=SideContainer
                 return;
             default:
                 break;
