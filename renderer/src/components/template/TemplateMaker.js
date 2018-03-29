@@ -6,6 +6,7 @@ import DynamicList from "../DynamicList/DynamicList";
 import ShortcutSelects from "../selects/ShortcutSelects";
 import store from "../../store"
 import "./css/template-maker.scss"
+import templateMaker from "../../js/templateMaker";
 
 const {clipboard} = window.require('electron');
 
@@ -53,37 +54,12 @@ export default class TemplateMaker extends BaseComponent {
                         </Form.Item>
                         <Form.Item label='模板内容'><Input.TextArea onInput={this.$onInput(v => {
 
-                            let defaultValues = {
-                                    Object: '{a:1,b:2,c:3}',
-                                    Array: '[1,2,3,4,5]',
-                                    Number: '123',
-                                    String: '"12345"'
-                                },
-                                result,
+                            let
                                 viewTemplate,
-                                compiledTemplate;
-                            result = `
-                function template() {
-
-return {
-    parameters:{
-        ${params.map(i => `${i.name}:${i.type}`)}
-    },
-    requestLib:{
-
-    },
-    //放在文件夹里时有用
-    events:{
-    },
-    compile(params,context) {
-        const {${params.map(i => `${i.name}=${defaultValues[i.type]}`)}} = params;
-        return \`
-            ${v}
-        \`
-    }
-}
-}`;
+                                compiledTemplate,
+                                result = templateMaker.make({template:v,params});
                             try {
+
                                 compiledTemplate = eval(`(${result})`)().compile({});
                             } catch (e) {
                                 compiledTemplate = e.message;

@@ -1,6 +1,7 @@
 import {TemplateJSFile} from "../views/ProjectTemplate";
 import store from "../store"
 import keyboard from "./vbs/keyboard";
+import templateMaker from "./templateMaker";
 
 const {clipboard, remote} = window.require('electron');
 const glob = remote.require("glob").sync;
@@ -15,11 +16,54 @@ export default function () {
     // 2018-3-28
     // set?$$0=多行内容
 
-    // addTemplate?template=`asdf`                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。
-    // params?labels=Array&
-    // test?[1,2,3,4,5]
+    //
+    // $template`asdf`                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。
+    // $params?labels=Array&
+    // $test?[1,2,3,4,5]            // 当有test存在时,只输出测试error和成功内容，不生成文件。如果test不存在则成功时生成文件。
+    // $$notify``
 
-    // addTemplate.demo
+
+    // template.demo = >    <style lang="scss">
+    //                                $$css`
+    //                                 .menu-panel{
+    //                                         border-top: r(1) solid #e4e4e4 ;
+    //                                         border-bottom: r(1) solid #e4e4e4 ;
+    //                                         background-color: #fff;
+    //                                         margin-bottom: r(30);
+    //                                     .menu-item+.menu-item{
+    //                                             border-top: r(1) solid #e4e4e4 ;
+    //                                         }
+    //                                     .menu-item{
+    //                                             display: flex;
+    //                                             padding-left: r(55);
+    //                                             line-height: 3em;
+    //                                             text{
+    //                                                 flex: 1;
+    //                                             }
+    //                                         .iconfont{
+    //                                                 font-size: r(30);
+    //                                                 margin-right: r(20);
+    //
+    //                                             &.icon-right{
+    //                                                     float: right;
+    //                                                     color: #aaa;
+    //                                                     font-size: r(25);
+    //                                                 }
+    //                                             }
+    //                                         }
+    //                                     }
+    //                                  `
+    //                      </style>
+    //                      <template>
+    //                          template`
+    //                          <view class="menu-panel">
+    //                             <view class="menu-item" @tap="onMenuTap('3')"><view class="iconfont icon-youhuiquan1"/><text>我的优惠券</text> <view class="iconfont icon-right" /></view>
+    //                             <view class="menu-item" @tap="onMenuTap('4')"><view class="iconfont icon-youhuiquan"/><text>我的优惠码</text> <view class="iconfont icon-right" /></view>
+    //                             <view class="menu-item" @tap="onMenuTap('score')"><view class="iconfont icon-jifen"/><text>我的积分</text> <view class="iconfont icon-right" /></view>
+    //                             <view class="menu-item" @tap="onMenuTap('account-manager')"><view class="iconfont icon-zhanghao"/><text>管理账号</text> <view class="iconfont icon-right" /></view>
+    //                          </view>
+    //                         `
+    //                      </template>
 
 
     // templates
@@ -63,108 +107,7 @@ export default function () {
     // 每一行都可以解析成对象
     let
         tempClipboardContent = clipboard.readText(),
-        clipboardContent;
-    // child_process.execSync("wscript ./main/test.vbs");
-    child_process.execSync("wscript ./main/copy.vbs");
-    clipboardContent = clipboard.readText();
-
-    let
-        lineReg = /\S+/g,
-        templateNameReg = /(?:(\S+)\?)|(?:(\S+))/,
-        noticeReg = /\$\$([0-19])/,
-        multiParamsReg = /`([^.]+?)`/g,
-        line,
-        variables = {},
-        commandOption = {
-            // 循环中的第一个就是command名，其他是big params, 可以通过 .modifier 是否存在来判断是否有modifier。
-            // Table:{
-            //     modifier:'file',
-            //     fields:['姓名','年龄','性别','职业'],
-            //     operation:[{
-            //         value:'删除',
-            //         modifier:'confirm'
-            //     },"更新"],
-            //     rest:[],
-
-
-            //     其他命令
-            //     $notify:{
-            //
-            //     }
-            // }
-        };
-
-
-    // 多行参数命令特殊,需要放在代码前头处理。
-    let index = 0;
-    clipboardContent.replace(multiParamsReg, (match, extract, index, source) => {
-        let key = `$$_${index++}`;
-        variables[key] = extract;
-        return match.replace(extract, key)
-    });
-
-
-    //  第一行是命令,第二行开始
-    while (line = lineReg.exec(clipboardContent)) {
-        line = line[0];
-        let
-            templateNameStr = templateNameReg.exec(line);
-
-        templateNameStr = templateNameStr.filter(i => i);
-        let
-            [name, modifier] = templateNameStr[1].split("."),
-            tempParams,
-            params = JSON.parse(JSON.stringify({modifier, rest: []}));
-        commandOption[name] = params;
-
-
-        line = line.replace(templateNameStr[0], "");
-        tempParams = line.split("&");
-
-        // 获取参数
-        tempParams.reduce((prev, cur) => {
-            cur = cur.split("=");
-            let [name, value] = cur;
-            let originValue = value;
-            if (!value) {
-                value = name;
-                name = undefined;
-            }
-
-            //将 a,b,c 变为数组
-            value = value.split(/[,，]/).map(i => {
-                // 获取参数的修饰器
-                const [name, modifier] = i.split(".")
-                return modifier ? {
-                    name,
-                    modifier
-                } : name
-            });
-
-            if (value.length <= 1) {
-                value = value[0];
-            }
-
-            if (!originValue) {
-                prev.rest = prev.rest.concat(value);
-            } else {
-                let [tempName, modifier] = name.split(".");
-                prev[tempName] = modifier ? {modifier, value} : value;
-            }
-            return prev
-        }, params);
-    }
-    console.log(commandOption);
-
-    // 开始编译
-    if (JSON.stringify(commandOption) === '{}') {
-        return;
-    }
-
-    // 从这里开始,有了context变量。
-    let
-        entries = Object.entries(commandOption),
-        [commandName, commandParams] = entries[0],
+        clipboardContent,
         output = keyboard.output,
         context = {
             error(msg) {
@@ -184,20 +127,172 @@ export default function () {
             }
         };
 
+    // child_process.execSync("wscript ./main/test.vbs");
+    child_process.execSync("wscript ./main/copy.vbs");
+    clipboardContent = clipboard.readText();
 
-    // 一、单独使用 $$0 的情况
-    //$$0.add
-    //$$0.update
-    // 二、使用notices查看notices列表
-
-    // 一些功能性的指令
-    let
-        regResult,
-        modifier = commandParams.modifier,
-        fileAddr;
 
 
     try {
+        let
+            lineReg = /\S+/g,
+            templateNameReg = /(?:(\S+)\?)|(?:(\S+))/,
+            noticeReg = /\$\$([0-19])/,
+            templateReg = /$template`([\s\S]+?)`/,
+            multiParamsReg = /`([\s\S]+?)`/g,
+            line,
+            variables = {},
+            commandOption = {
+                // 循环中的第一个就是command名，其他是big params, 可以通过 .modifier 是否存在来判断是否有modifier。
+                // Table:{
+                //     modifier:'file',
+                //     fields:['姓名','年龄','性别','职业'],
+                //     operation:[{
+                //         value:'删除',
+                //         modifier:'confirm'
+                //     },"更新"],
+                //     rest:[],
+
+
+                //     其他命令
+                //     $notify:{
+                //
+                //     }
+                // }
+            };
+
+
+        // 先判断是不是template指令
+
+        let templateResult = templateReg.exec(clipboardContent);
+
+        if (templateResult) {
+            let
+                templateOption = {
+                    template: templateResult[1],
+                    notify: {}
+                },
+                noticeReg = /\$\$(.+?)`([\s\S]+?)`/,
+                paramsReg = /\$params\?(.+)/,
+                testReg = /\$test\?(.+)/,    // ? 可有可无
+                paramsResult = paramsReg.exec(clipboardContent),
+                testResult = testReg.exec(clipboardContent),
+                noticeResult = noticeReg.exec(clipboardContent);
+
+                function toObject(paramsResult) {
+                    return paramsResult[1].split("&").reduce((prev, cur) => {
+                        cur = cur.split("=");
+                        prev[cur[0]] = cur[1];
+                        return prev;
+                    }, {});
+                }
+
+                if (testResult) {
+                    templateOption.test = toObject(testResult);
+                }
+
+                if (noticeResult) {
+                    templateOption.notify[noticeResult[1]] = noticeResult[2];
+                }
+
+                if (paramsResult) {
+                    templateOption.params = toObject(paramsResult);
+                }
+
+                templateMaker.make({template:templateOption.template, params:templateOption.params, defaultValues:});
+
+
+                if (templateOption.test) {
+
+                }
+
+                return;
+        }
+
+
+        // 多行参数命令特殊,需要放在代码前头处理。
+        // let index = 0;
+        // clipboardContent.replace(multiParamsReg, (match, extract, index, source) => {
+        //     let key = `$$_${index++}`;
+        //     variables[key] = extract;
+        //     return match.replace(extract, key)
+        // });
+
+
+        //  第一行是命令,第二行开始
+        while (line = lineReg.exec(clipboardContent)) {
+            line = line[0];
+            let
+                templateNameStr = templateNameReg.exec(line);
+
+            templateNameStr = templateNameStr.filter(i => i);
+            let
+                [name, modifier] = templateNameStr[1].split("."),
+                tempParams,
+                params = JSON.parse(JSON.stringify({modifier, rest: []}));
+            commandOption[name] = params;
+
+
+            line = line.replace(templateNameStr[0], "");
+            tempParams = line.split("&");
+
+            // 获取参数
+            tempParams.reduce((prev, cur) => {
+                cur = cur.split("=");
+                let [name, value] = cur;
+                let originValue = value;
+                if (!value) {
+                    value = name;
+                    name = undefined;
+                }
+
+                //将 a,b,c 变为数组
+                value = value.split(/[,，]/).map(i => {
+                    // 获取参数的修饰器
+                    const [name, modifier] = i.split(".")
+                    return modifier ? {
+                        name,
+                        modifier
+                    } : name
+                });
+
+                if (value.length <= 1) {
+                    value = value[0];
+                }
+
+                if (!originValue) {
+                    prev.rest = prev.rest.concat(value);
+                } else {
+                    let [tempName, modifier] = name.split(".");
+                    prev[tempName] = modifier ? {modifier, value} : value;
+                }
+                return prev
+            }, params);
+        }
+        console.log(commandOption);
+
+        // 开始编译
+        if (JSON.stringify(commandOption) === '{}') {
+            return;
+        }
+
+        // 从这里开始,有了context变量。
+        let
+            entries = Object.entries(commandOption),
+            [commandName, commandParams] = entries[0];
+
+
+        // 一、单独使用 $$0 的情况
+        //$$0.add
+        //$$0.update
+        // 二、使用notices查看notices列表
+
+        // 一些功能性的指令
+        let
+            regResult,
+            modifier = commandParams.modifier,
+            fileAddr;
+
         switch (true) {
             case !!(regResult = noticeReg.exec(commandName)):
                 regResult = regResult[1];
