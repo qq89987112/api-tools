@@ -95,6 +95,7 @@ export default function () {
     // $template`asdf`?                                必须以 `?结尾
     // $template`asdf`?file=./vue/cell                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。 file可以输入相对路径来生成文件。   cell 这个名字参考了有赞小程序库
     // $params?labels=Array&
+    // $test
     // $test?[1,2,3,4,5]            // 当有test存在时,只输出测试error和成功内容，不生成文件。如果test不存在则成功时生成文件。
     // $$notify``
 
@@ -233,7 +234,7 @@ export default function () {
                 file = templateResult[2],
                 noticeReg = /\$\$(.+?)`([\s\S]+?)`/,
                 paramsReg = /\$params\?.+/,
-                testReg = /\$test\?.+/,    // ? 可有可无
+                testReg = /\$test\??.*/,    // ? 可有可无
                 paramsResult = paramsReg.exec(clipboardContent),
                 testResult = testReg.exec(clipboardContent),
                 noticeResult = noticeReg.exec(clipboardContent),
@@ -264,7 +265,7 @@ export default function () {
             if (templateOption.test) {
                 templateResult = templateMaker.make({
                     template: `${templateOption.template}
-                        想要生成文件,您可以将 $test 直接改为 $params
+                        以上是生成的测试内容
                     `,
                     params: Object.entries(templateOption.test || {}).reduce((prev, cur) => {
                         return prev.concat({
@@ -281,14 +282,14 @@ export default function () {
                     context.error("请指定file 或者 先测试。");
                     return;
                 }
-                if (!templateOption.params) {
-                    context.error("请指定$params 您可以将 $test 直接改为 $params");
-                    return;
-                }
+                // if (!templateOption.params) {
+                //     context.error("请指定$params 您可以将 $test 直接改为 $params");
+                //     return;
+                // }
                 let fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file",file);
                 templateResult = templateMaker.make({
                     template: templateOption.template,
-                    params: Object.entries(templateOption.params).reduce((prev, cur) => {
+                    params: Object.entries(templateOption.params||{}).reduce((prev, cur) => {
                         let value = cur[1];
                         value = Object.prototype.toString.call(value).slice(8,-1);
                         return prev.concat({
