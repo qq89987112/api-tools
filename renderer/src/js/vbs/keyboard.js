@@ -11,6 +11,14 @@ export default {
         clipboard.writeText(message);
         child_process.execSync("wscript ./main/paste.vbs");
     },
+    /**
+     *   keyboard.options(`文件路径已经存在文件:${fileAddr},是否继续？`,["是","否"]).then((selects)=>{
+     *        let select = selects[0];
+     *    });
+     * @param tooltip
+     * @param list
+     * @return {Promise<any>}
+     */
     options(tooltip,list){
         this.output(`\r\n${tooltip}：\r\n${list.map((item,index)=>`${index+1}:${item}`).join('\r\n')}\r\n`);
         return new Promise((resolve, reject) => {
@@ -23,6 +31,7 @@ export default {
                         shortcuts
                     })
                     resolve([index]);
+                    // 为了 撤回一下 方便清屏输出新内容
                     this.sendKeys("^{z}")
                 }
             }));

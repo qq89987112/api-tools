@@ -12,7 +12,7 @@ export default function (state = notices,action){
     let notice;
     switch(action.type){
         case "NOTICE_ADD":
-            state = [...state,action.notice];
+            state = [action.notice,...state].slice(0,15);
             break;
         default:
             ;

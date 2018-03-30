@@ -5,13 +5,41 @@ export default {
     //              type:'type'
     //          }
     //      ]
-    make({template, params = [], defaultValues}) {
+    make({template, params = [], defaultValues,notices={}}) {
         let typeDefaultValues = {
             Object: '{a:1,b:2,c:3}',
             Array: '[1,2,3,4,5]',
             Number: '123',
             String: '"12345"'
         };
+
+        if (defaultValues) {
+            defaultValues = Object.entries(defaultValues).reduce((total,cur)=>{
+                let
+                    value = cur[1],
+                    type = Object.prototype.toString.call(value);
+
+                switch (type){
+                    case "[object Array]":
+                        value = `[${value.map(i=>`"${i}"`)}]`;
+                        break;
+                    case "[object String]":
+                        value = `"${value}"`;
+                        break;
+                    case "[object Number]":
+                        break;
+                    case "[object Object]":
+                        value = JSON.stringify(value)
+                        break;
+                    default:
+                        break;
+                }
+                total[cur[0]] = value;
+                return total;
+            },{})
+        }
+
+
         return `
                 function template() {
 
@@ -27,6 +55,8 @@ return {
     },
     compile(params,context) {
         const {${params.map(i => `${i.name}=${defaultValues ? defaultValues[i.name] : typeDefaultValues[i.type]}`)}} = params;
+        
+         context&&context.notify(undefined,undefined,${JSON.stringify()});
         return \`
             ${template}
         \`

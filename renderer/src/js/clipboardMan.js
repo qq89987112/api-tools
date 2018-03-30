@@ -3,13 +3,88 @@ import store from "../store"
 import keyboard from "./vbs/keyboard";
 import templateMaker from "./templateMaker";
 
+
 const {clipboard, remote} = window.require('electron');
 const glob = remote.require("glob").sync;
 const fse = remote.require("fs-extra");
 const path = remote.require("path");
 const child_process = remote.require("child_process");
+const jsBeautify = remote.require("js-beautify");
 // const robot = remote.require("robotjs");
 // const ks = remote.require("node-key-sender");
+
+
+const utils = {
+    /**
+     *
+     * @param line
+     * @return [objectName,object]
+     * 其中 object 格式为
+     *         {
+     *               modifier:'file',
+     *               fields:['姓名','年龄','性别','职业'],
+     *               operation:[{
+     *                   value:'删除',
+     *                   modifier:'confirm'
+     *               },"更新"],
+     *               rest:[],
+     *               其他命令
+     *               $notify:{
+     *
+     *               }
+     *           }
+     *  除了command的名字外，都在object中。
+     */
+    parseLineToObject(line) {
+        let
+            templateNameReg = /(?:(\S+)\?)|(?:(.+))/,
+            templateNameStr = templateNameReg.exec(line);
+        templateNameStr = templateNameStr.filter(i => i);
+        let
+            [name, modifier] = templateNameStr[1].split("."),
+            tempParams,
+            params = JSON.parse(JSON.stringify({modifier, rest: []}));
+
+        line = line.replace(templateNameStr[0], "");
+        tempParams = line.split("&");
+
+        // 获取参数
+        tempParams.reduce((prev, cur) => {
+            cur = cur.split("=");
+            let [name, value] = cur;
+            let originValue = value;
+            if (!value) {
+                value = name;
+                name = undefined;
+            }
+
+            //将 a,b,c 变为数组
+            value = value.split(/[,，]/).map(i => {
+                // 获取参数的修饰器
+                const [name, modifier] = i.split(".")
+                return modifier ? {
+                    name,
+                    modifier
+                } : name
+            });
+
+            if (value.length <= 1) {
+                value = value[0];
+            }
+
+            if (!originValue) {
+                prev.rest = prev.rest.concat(value);
+            } else {
+                let [tempName, modifier] = name.split(".");
+                prev[tempName] = modifier ? {modifier, value} : value;
+            }
+            return prev
+        }, params);
+
+        return [name, params];
+    }
+}
+
 
 export default function () {
 
@@ -17,6 +92,7 @@ export default function () {
     // set?$$0=多行内容
 
     //
+    // $template`asdf`?                                必须以 `?结尾
     // $template`asdf`?file=./vue/cell                 // 用 `` 包裹,方便利用编辑器的智能提示来写模板。 file可以输入相对路径来生成文件。   cell 这个名字参考了有赞小程序库
     // $params?labels=Array&
     // $test?[1,2,3,4,5]            // 当有test存在时,只输出测试error和成功内容，不生成文件。如果test不存在则成功时生成文件。
@@ -55,14 +131,12 @@ export default function () {
     //                                  `
     //                      </style>
     //                      <template>
-    //                          template`
+    //                          $template`
     //                          <view class="menu-panel">
-    //                             <view class="menu-item" @tap="onMenuTap('3')"><view class="iconfont icon-youhuiquan1"/><text>我的优惠券</text> <view class="iconfont icon-right" /></view>
-    //                             <view class="menu-item" @tap="onMenuTap('4')"><view class="iconfont icon-youhuiquan"/><text>我的优惠码</text> <view class="iconfont icon-right" /></view>
-    //                             <view class="menu-item" @tap="onMenuTap('score')"><view class="iconfont icon-jifen"/><text>我的积分</text> <view class="iconfont icon-right" /></view>
-    //                             <view class="menu-item" @tap="onMenuTap('account-manager')"><view class="iconfont icon-zhanghao"/><text>管理账号</text> <view class="iconfont icon-right" /></view>
+    //                             ${labels.map(i=>`<view class="menu-item"><view class="iconfont"/><text>${i}</text> <view class="iconfont icon-right" /></view>`).join("\r\n")}
     //                          </view>
-    //                         `?name=
+    //                         `?file=./vue/cell.js
+    //                          $test?labels=我的优惠券,我的优惠码,我的积分,管理账号
     //                      </template>
 
 
@@ -117,13 +191,15 @@ export default function () {
                 return keyboard.options('有多个地址,请选择其中一个', list);
             },
             notify(path, events, params, options) {
-                // 测试时暂时这么写。
-                store.dispatch({
-                    type: "NOTICE_ADD",
-                    notice: {
-                        path, events, params, options
-                    }
-                })
+                if (params) {
+                    // 测试时暂时这么写。
+                    store.dispatch({
+                        type: "NOTICE_ADD",
+                        notice: {
+                            path, events, params, options
+                        }
+                    })
+                }
             }
         };
 
@@ -132,34 +208,15 @@ export default function () {
     clipboardContent = clipboard.readText();
 
 
-
     try {
         let
-            lineReg = /\S+/g,
-            templateNameReg = /(?:(\S+)\?)|(?:(\S+))/,
+            lineReg = /.+/g,
             noticeReg = /\$\$([0-19])/,
-            templateReg = /$template`([\s\S]+?)`/,
+            templateReg = /\$template`([\s\S]+?)`\?(?:file=(\S+))?/,
             multiParamsReg = /`([\s\S]+?)`/g,
             line,
             variables = {},
-            commandOption = {
-                // 循环中的第一个就是command名，其他是big params, 可以通过 .modifier 是否存在来判断是否有modifier。
-                // Table:{
-                //     modifier:'file',
-                //     fields:['姓名','年龄','性别','职业'],
-                //     operation:[{
-                //         value:'删除',
-                //         modifier:'confirm'
-                //     },"更新"],
-                //     rest:[],
-
-
-                //     其他命令
-                //     $notify:{
-                //
-                //     }
-                // }
-            };
+            commandOption = {};
 
 
         // 先判断是不是template指令
@@ -167,55 +224,98 @@ export default function () {
         let templateResult = templateReg.exec(clipboardContent);
 
         if (templateResult) {
+
             let
                 templateOption = {
                     template: templateResult[1],
                     notify: {}
                 },
+                file = templateResult[2],
                 noticeReg = /\$\$(.+?)`([\s\S]+?)`/,
-                paramsReg = /\$params\?(.+)/,
-                testReg = /\$test\?(.+)/,    // ? 可有可无
+                paramsReg = /\$params\?.+/,
+                testReg = /\$test\?.+/,    // ? 可有可无
                 paramsResult = paramsReg.exec(clipboardContent),
                 testResult = testReg.exec(clipboardContent),
                 noticeResult = noticeReg.exec(clipboardContent),
-                templateResult;
+                name, params;
 
-                function toObject(paramsResult) {
-                    return paramsResult[1].split("&").reduce((prev, cur) => {
-                        cur = cur.split("=");
-                        prev[cur[0]] = cur[1];
-                        return prev;
-                    }, {});
-                }
+            // function toObject(paramsResult) {
+            //     return paramsResult[1].split("&").reduce((prev, cur) => {
+            //         cur = cur.split("=");
+            //         prev[cur[0]] = cur[1];
+            //         return prev;
+            //     }, {});
+            // }
+            if (testResult) {
+                [name, params] = utils.parseLineToObject(testResult[0]);
+                templateOption.test = params;
+            }
 
-                if (testResult) {
-                    templateOption.test = toObject(testResult);
-                }
+            if (noticeResult) {
+                templateOption.notify[noticeResult[1]] = noticeResult[2];
+            }
 
-                if (noticeResult) {
-                    templateOption.notify[noticeResult[1]] = noticeResult[2];
-                }
+            if (paramsResult) {
+                [name, params] = utils.parseLineToObject(paramsResult[0]);
+                templateOption.params = params;
+            }
 
-                if (paramsResult) {
-                    templateOption.params = toObject(paramsResult);
-                }
 
-                templateResult = templateMaker.make({template:templateOption.template, params:Object.entries(templateOption.params).reduce((prev,cur)=>{
+            if (templateOption.test) {
+                templateResult = templateMaker.make({
+                    template: `${templateOption.template}
+                        想要生成文件,您可以将 $test 直接改为 $params
+                    `,
+                    params: Object.entries(templateOption.test || {}).reduce((prev, cur) => {
                         return prev.concat({
-                            name:cur[0],
-                            type:cur[1]
+                            name: cur[0],
+                            type: "Object"
                         })
-                    },[]), defaultValues:templateOption.test});
-
-
-
-                if (templateOption.test) {
-                    context.output(eval(`(${templateResult})`).compile({},context));
-                }else{
-
+                    }, []),
+                    notices:templateOption.notify,
+                    defaultValues: templateOption.test
+                });
+                output(eval(`(${templateResult})()`).compile({}, context));
+            } else {
+                if (!file) {
+                    context.error("请指定file 或者 先测试。");
+                    return;
                 }
+                if (!templateOption.params) {
+                    context.error("请指定$params 您可以将 $test 直接改为 $params");
+                    return;
+                }
+                let fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file",file);
+                templateResult = templateMaker.make({
+                    template: templateOption.template,
+                    params: Object.entries(templateOption.params).reduce((prev, cur) => {
+                        let value = cur[1];
+                        value = Object.prototype.toString.call(value).slice(8,-1);
+                        return prev.concat({
+                            name: cur[0],
+                            type: value
+                        })
+                    }, []),
+                    notices:templateOption.notify,
+                });
+                let promise = Promise.resolve();
+                if (fse.existsSync(fileAddr)) {
+                    promise = keyboard.options(`文件路径已经存在文件:${fileAddr},是否继续？`,["是","否"]).then((selects)=>{
+                        let select = selects[0];
+                        if(select===0){
+                            return Promise.resolve();
+                        }else{
+                            return Promise.reject();
+                        }
+                    });
+                }
+                promise.then(()=>{
+                    fse.outputFileSync(fileAddr,jsBeautify.js(templateResult));
+                    keyboard.output("生成成功");
+                })
+            }
 
-                return;
+            return;
         }
 
 
@@ -231,52 +331,10 @@ export default function () {
         //  第一行是命令,第二行开始
         while (line = lineReg.exec(clipboardContent)) {
             line = line[0];
-            let
-                templateNameStr = templateNameReg.exec(line);
 
-            templateNameStr = templateNameStr.filter(i => i);
-            let
-                [name, modifier] = templateNameStr[1].split("."),
-                tempParams,
-                params = JSON.parse(JSON.stringify({modifier, rest: []}));
+            let [name, params] = utils.parseLineToObject(line);
+
             commandOption[name] = params;
-
-
-            line = line.replace(templateNameStr[0], "");
-            tempParams = line.split("&");
-
-            // 获取参数
-            tempParams.reduce((prev, cur) => {
-                cur = cur.split("=");
-                let [name, value] = cur;
-                let originValue = value;
-                if (!value) {
-                    value = name;
-                    name = undefined;
-                }
-
-                //将 a,b,c 变为数组
-                value = value.split(/[,，]/).map(i => {
-                    // 获取参数的修饰器
-                    const [name, modifier] = i.split(".")
-                    return modifier ? {
-                        name,
-                        modifier
-                    } : name
-                });
-
-                if (value.length <= 1) {
-                    value = value[0];
-                }
-
-                if (!originValue) {
-                    prev.rest = prev.rest.concat(value);
-                } else {
-                    let [tempName, modifier] = name.split(".");
-                    prev[tempName] = modifier ? {modifier, value} : value;
-                }
-                return prev
-            }, params);
         }
         console.log(commandOption);
 
@@ -323,7 +381,7 @@ export default function () {
                     fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file/**/**.js");
                 }
                 let templates = glob(fileAddr);
-                keyboard.output("\r\n" + templates.map((item, index) => `${index + 1}：${item}`).join('\r\n') + "\r\n");
+                keyboard.output("\r\n目前的模板列表如下：\r\n" + templates.map((item, index) => `${index + 1}：${item}`).join('\r\n') + "\r\n");
                 return;
             case commandName === 'set':
                 // 名字需要以$开头。
@@ -338,6 +396,7 @@ export default function () {
         } else {
             fileAddr = path.join(remote.getGlobal("__dirname"), `../plugins/template/single-file/**/*${commandName}*.js`);
         }
+
 
         const
             addrs = glob(fileAddr);
@@ -405,6 +464,7 @@ export default function () {
 
         clipboard.writeText(tempClipboardContent);
     } catch (e) {
+        console.error(e);
         context.error(e.message);
     }
 }
