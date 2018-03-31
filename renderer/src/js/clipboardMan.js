@@ -313,6 +313,7 @@ export default function () {
                 }
                 promise.then(()=>{
                     fse.outputFileSync(fileAddr,jsBeautify.js(templateResult));
+                    // 将这个 生成成功 替换为把 template语法去掉之后的原代码
                     keyboard.output("生成成功");
                 })
             }
