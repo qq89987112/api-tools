@@ -232,12 +232,12 @@ export default function () {
                     notify: {}
                 },
                 file = templateResult[2],
-                noticeReg = /\$\$(.+?)`([\s\S]+?)`/,
+                noticeReg = /\$\$(.+?)`([\s\S]+?)`/g,
                 paramsReg = /\$params\?.+/,
                 testReg = /\$test\??.*/,    // ? 可有可无
                 paramsResult = paramsReg.exec(clipboardContent),
                 testResult = testReg.exec(clipboardContent),
-                noticeResult = noticeReg.exec(clipboardContent),
+                noticeResult,
                 name, params;
 
             // function toObject(paramsResult) {
@@ -252,9 +252,10 @@ export default function () {
                 templateOption.test = params;
             }
 
-            if (noticeResult) {
+            while (noticeResult = noticeReg.exec(clipboardContent)) {
                 templateOption.notify[noticeResult[1]] = noticeResult[2];
             }
+
 
             if (paramsResult) {
                 [name, params] = utils.parseLineToObject(paramsResult[0]);
@@ -265,7 +266,7 @@ export default function () {
             if (templateOption.test) {
                 templateResult = templateMaker.make({
                     template: `${templateOption.template}
-                        以上是生成的测试内容
+                        以上是生成的测试内容,生成文件需要(非必须)的$params可以从$test中获取。
                     `,
                     params: Object.entries(templateOption.test || {}).reduce((prev, cur) => {
                         return prev.concat({

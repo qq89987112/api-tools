@@ -39,6 +39,16 @@ export default {
             },{})
         }
 
+        // 不能用这个, 多行字符串将丢失
+        // notices = JSON.stringify(notices,undefined,'\t');
+        let objectKeyValue = Object.entries(notices).map((cur)=>{
+             return `${cur[0]}:\`${cur[1]}\``
+        }).join(",\r\n");
+
+        notices = `{
+                ${objectKeyValue}
+        }`;
+
 
         return `
                 function template() {
@@ -56,7 +66,7 @@ return {
     compile(params,context) {
         const {${params.map(i => `${i.name}=${defaultValues ? defaultValues[i.name] : typeDefaultValues[i.type]}`)}} = params;
         
-         context&&context.notify(undefined,undefined,${JSON.stringify()});
+         context&&context.notify(undefined,undefined,${notices});
         return \`
             ${template}
         \`
