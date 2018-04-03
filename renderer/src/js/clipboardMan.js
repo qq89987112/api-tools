@@ -147,6 +147,9 @@ export default function () {
     // 2018-02-02
 
     // SideContainer?p=路演管理，公司管理，人员管理，审批管理&i=icon-right,icon-other
+
+    // SideContainer?groups=审核，公司管理&groups$0=身份认证,IR团队认证,groups$1
+
     //  or SideContainer?路演管理，公司管理，人员管理，审批管理&icon-right,icon-other
     //  or $configName?路演管理，公司管理，人员管理，审批管理&icon-right,icon-other
 
@@ -174,6 +177,7 @@ export default function () {
     // api?/api/base/getUserInfo.base =>
 //                                       1、您没有配置实际项目地址,请输入项目地址：$projectAddr。
 //                                       2、setEnv?$projectAddr&D:\code\github\api-tools
+
 
 
     // ks.sendKeys(['a', 'b', 'c']);
