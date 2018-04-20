@@ -36,6 +36,10 @@ export const Views = [
         path: 'snippets制作',
         component: SnippetsMaker
     },
+    {
+        path: '今日试玩',
+        component: SnippetsMaker
+    },
 ]
 
 export default class App extends Component {

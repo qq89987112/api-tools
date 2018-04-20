@@ -15,7 +15,7 @@ function a() {
                     content = content.replace(/(\/\*<Form.Item><Button htmlType='submit' type='primary'>新增<\/Button><\/Form.Item>\*\/)/,
                         (match,extart)=>{
                             return match.replace(extart,params.add)
-                        }).replace(/\{title:'操作':render:\(\)=><p>(\/\*<Button>修改<\/Button>\*\/)<p>\}/,
+                        }).replace(/\{title:'操作',render:\(\)=><p>(\/\*<Button>修改<\/Button>\*\/)<p>\}/,
                         (match,extart)=>{
                             return match.replace(extart,params.update)
                         })
@@ -24,7 +24,7 @@ function a() {
             }
         },
         compile(params) {
-            const {columns, className,headers,dataIndexs} = params;
+            const {columns=[], className="",headers=[],dataIndexs=[]} = params;
             const className2 = className.replace(/^\S/,s=>s.toLowerCase());
             return `
 import React from "react";
@@ -59,7 +59,7 @@ export default class ${className} extends BaseComponent{
                         ${
                 columns.map((i,index)=>`{title: "${i}", dataIndex: '${dataIndexs[index]}',},`).join("\r\n")
                 }
-                        {title:'操作':render:()=><p>/*<Button>修改</Button>*/<p>}
+                        {title:'操作',render:()=><p>/*<Button>修改</Button>*/<p>}
                     ]}
                     dataSource={this.state.${className2}}
                     loading={this.$isLoading("${className2}")}

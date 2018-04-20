@@ -6,6 +6,12 @@ let jquery = remote.require("jquery");
 let JSDOM = remote.require("jsdom").JSDOM;
 
 /*
+*
+*
+*
+* serverSideJquery("http://www.baidu.com").then($=>{
+*
+* });
 * 服务端渲染，但是，会造成 回调函数 的内存泄露问题
 * 解决：
 *   类似 map 的回调函数,用 for...i 循坏解决,或者 [].concat($.get()), $.get() 的不能直接使用,因为这个array的map方法存在于remote端。
