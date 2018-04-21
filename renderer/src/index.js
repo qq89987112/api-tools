@@ -4,9 +4,9 @@ import './index.css';
 import App from './views/index';
 import './assests';
 import registerServiceWorker from './registerServiceWorker';
-import dm from "./js/vbs/damo"
+const {remote} =  window.require("electron");
 
-window.dm = dm;
+window.dm = remote.require("./scripts/damo").dmWrapper;
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();

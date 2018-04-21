@@ -1,4 +1,6 @@
 const {app,BrowserWindow,globalShortcut} = require('electron')
+require('./scripts/dev')
+
 let mainWindow;
 
 global.baseURL = `http://localhost:3000`;
@@ -16,7 +18,8 @@ let createWindow = () => {
     global.mainWindow = mainWindow;
     global.__dirname = __dirname;
     mainWindow.maximize();
-    mainWindow.loadURL(`${global.baseURL}/#/`);
+    // mainWindow.loadURL(`${global.baseURL}/#/`);
+    mainWindow.loadURL('http://www.501wan.com/start/2217.html');
 
     if(global.NODE_ENV === `development`){
         //打开控制台
@@ -43,8 +46,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (mainWindow === null
-    ) {
+    if (mainWindow === null) {
         createWindow();
     }
 });
