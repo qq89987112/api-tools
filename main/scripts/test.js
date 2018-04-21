@@ -7,8 +7,6 @@ module.exports = {
         },
         trigger() {
             // 用于识别外部环境是否准备好。
-
-            //    是否已经在游戏中。
             let isOk = !!this.$dm.findPicEx("ready.bmp");
             if (isOk) {
                 // (?:http|https):\/\/([^\/\s]+)\/?
@@ -18,6 +16,10 @@ module.exports = {
                 this.$log(url);
                 return this.$accounts.getAccount(/((?:http|https):\/\/[^\/\s]+)\/?/.exec(url)[1]);
             }
+
+            //    是否已经在游戏中。
+            isOk = !!this.$dm.findPicEx("ready.bmp")
+
 
         }
     },
@@ -30,7 +32,7 @@ module.exports = {
             ret =  ret&&this.$dm.clickPic("password.bmp",{offsetX:100} )
             ret&&this.$dm.sendString(account.password);
 
-            ret =  ret&&this.$dm.clickPic("login.bmp")
+            ret =  ret&&this.$dm.clickPic("login**.bmp")
             return ret;
         },
     },

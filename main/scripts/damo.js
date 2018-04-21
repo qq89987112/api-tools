@@ -1,6 +1,7 @@
 const child_process = require("child_process");
 const path = require("path");
 const prefix = `python ${path.join(__dirname,"../damo/cli.py")}`;
+const glob = require("glob").sync;
 let config = {
     path:""
 }
@@ -244,22 +245,35 @@ let dm = {
     }
 ;
 dm.setPath("d:/test");
+
+function getFilePath(fileName) {
+    if (config.path) {
+        let address = `${config.path}/${fileName}`;
+        let addr = glob(address);
+        return addr[0];
+    } else {
+        return fileName;
+    }
+}
+
 module.exports.dm = dm;
 
 module.exports.dmWrapper = Object.assign({},dm,{
         getPicSize(bitmap){
-            return dm.getPicSize(config.path ? `${config.path}/${bitmap}`:bitmap);
+            return dm.getPicSize(getFilePath(bitmap));
         },
         findPicEx(bitmap){
-            return dm.findPicEx(0,0,2000,2000,config.path ? `${config.path}/${bitmap}`:bitmap,"020202",0.8,0);
+            return dm.findPicEx(0, 0, 2000, 2000, getFilePath(bitmap), "020202", 0.8, 0);
         },
-        click(x,y){
+    click(x,y){
             dm.moveTo(x,y);
             dm.leftClick();
 
         },
         clickPic(bitmap,{center=true,offsetX = 0,offsetY = 0}={}){
             //    0,0,0
+            let [name,fileOffsetX=0,fileOffsetY=0] = getFilePath(bitmap).split("/").slice(-1)[0].split("-");
+
             let ret = this.findPicEx(bitmap);
             let [,x,y] = ret.split(",");
             if (center) {
@@ -270,7 +284,7 @@ module.exports.dmWrapper = Object.assign({},dm,{
                 y += parseInt((+picH)/2);
             }
             if (x && y) {
-                dm.moveTo(x+offsetX,y+offsetY);
+                dm.moveTo(x+(parseInt(fileOffsetX)||offsetX),y+(parseInt(fileOffsetY)||offsetY));
                 dm.leftClick();
                 return true;
             }
