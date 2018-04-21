@@ -1,6 +1,7 @@
 
 module.exports = {
     // 当外部环境已经准备好。
+    name:"建国霸业",
     created: {
         todo(account) {
             this.$invoke("login",account);
@@ -12,9 +13,10 @@ module.exports = {
                 // (?:http|https):\/\/([^\/\s]+)\/?
                 // "http://www.501wan.com/passport/sign/index.html?tourl=http%3A%2F%2Fwww.501wan.com%2Fstart%2F2217.html"
                 // "http://www.501wan.com"
-                let url = global.mainWindow.webContents.getURL();
-                this.$log(url);
-                return this.$accounts.getAccount(/((?:http|https):\/\/[^\/\s]+)\/?/.exec(url)[1]);
+                // let url = global.mainWindow.webContents.getURL();
+                // this.$log(url);
+                // return this.$accounts.getAccount(/((?:http|https):\/\/[^\/\s]+)\/?/.exec(url)[1]);
+                return this.$accounts.getAccount("建国霸业");
             }
 
             //    是否已经在游戏中。
