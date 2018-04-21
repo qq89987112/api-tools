@@ -256,6 +256,7 @@ module.exports.dmWrapper = Object.assign({},dm,{
         click(x,y){
             dm.moveTo(x,y);
             dm.leftClick();
+
         },
         clickPic(bitmap,{center=true,offsetX = 0,offsetY = 0}={}){
             //    0,0,0
@@ -276,7 +277,7 @@ module.exports.dmWrapper = Object.assign({},dm,{
             return false;
         },
         sendString(text){
-            child_process.execSync(`wscript ${path.join(__dirname,"../sendKeys.vbs")} ${text}`);
+            child_process.execSync(`wscript ${path.join(__dirname,"../damo/sendString.vbs")} ${text}`);
         }
     }
 )

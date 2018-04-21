@@ -31,7 +31,6 @@ module.exports = {
             ret&&this.$dm.sendString(account.password);
 
             ret =  ret&&this.$dm.clickPic("login.bmp")
-
             return ret;
         },
     },
