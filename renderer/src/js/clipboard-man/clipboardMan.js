@@ -1,7 +1,7 @@
-import {TemplateJSFile} from "../views/ProjectTemplate";
-import store from "../store"
-import keyboard from "./vbs/keyboard";
-import templateMaker from "./templateMaker";
+import {TemplateJSFile} from "../../views/ProjectTemplate";
+import store from "../../store/index"
+import keyboard from "../vbs/keyboard";
+import templateMaker from "../templateMaker";
 
 
 const {clipboard, remote} = window.require('electron');
@@ -136,7 +136,7 @@ export default function () {
     //                          <view class="menu-panel">
     //                             ${labels.map(i=>`<view class="menu-item"><view class="iconfont"/><text>${i}</text> <view class="iconfont icon-right" /></view>`).join("\r\n")}
     //                          </view>
-    //                         `?file=./vue/cell.js
+    //                         `?file=./vue/test.js
     //                          $test?labels=我的优惠券,我的优惠码,我的积分,管理账号
     //                      </template>
 
@@ -270,7 +270,7 @@ export default function () {
             if (templateOption.test) {
                 templateResult = templateMaker.make({
                     template: `${templateOption.template}
-                        以上是生成的测试内容,生成文件需要(非必须)的$params可以从$test中获取。
+                        以上是生成的测试内容,生成文件需要(非必须)的$params就是$test时的所用的内容。
                     `,
                     params: Object.entries(templateOption.test || {}).reduce((prev, cur) => {
                         return prev.concat({

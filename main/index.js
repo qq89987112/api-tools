@@ -1,5 +1,5 @@
 const {app,BrowserWindow,globalShortcut} = require('electron')
-require('./scripts/dev')
+// require('./scripts/dev')
 
 let mainWindow;
 

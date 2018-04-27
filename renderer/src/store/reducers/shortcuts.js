@@ -6,7 +6,7 @@ import JSTemplateGenerator from "../../components/template/JSTemplateGenerator";
 import {Views} from "../../views";
 import store from "../index";
 import {Provider} from 'react-redux'
-import clipboardMan from "../../js/clipboardMan"
+import clipboardMan from "../../js/clipboard-man/clipboardMan"
 import {Project} from "../../views/ProjectTemplate";
 
 const {clipboard} = window.require('electron');
