@@ -13,27 +13,16 @@ function template() {
             const {} = params;
 
             context && context.notify(undefined, undefined, {
-                css: `
-    .actions{
-      display: flex;
-      background-color: #fff;
-      .action{
-        padding: r(30) 0;
-        flex: 1;
-        text-align: center;
-      }
-    }`
+
             });
             return `
-            
-      <div class="actions">
-        <div class="action">
-          1
-        </div>
-        <div class="action">
-          2
-        </div>
-      </div>
+            [class$=page]{
+    font-size: r(26);
+    background-color: #f4f4f4;
+    height: 100vh;
+    overflow-y: auto;
+    color: #555;
+  }
         `
         }
     }

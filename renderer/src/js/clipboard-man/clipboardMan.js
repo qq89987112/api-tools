@@ -91,7 +91,7 @@ export default function () {
     // 2018-4-28
     // $css`<div class="a">                                 .a{
     //      <div class="b">                 =>                  .b{
-    //          <div class="c"></div>                               .c{}
+    //          <div class="c"></div>                               .c{}            生成成功则去掉 $css 包裹
     //      </div>                                               }
     // </div>`                                               }
 
@@ -226,13 +226,17 @@ export default function () {
             lineReg = /.+/g,
             noticeReg = /\$\$([0-19])/,
             templateReg = /\$template`([\s\S]+?)`\?(?:file=(\S+))?/,
+            htmlTagReg = /<[^\/]+>([\s\S]+)<\/.+>/,
+            classTag = /<[^\/\n]+[^:]class="(.+?)"[^\/\n]*>/,
             multiParamsReg = /`([\s\S]+?)`/g,
             line,
             variables = {},
             commandOption = {};
 
 
-        // 先判断是不是template指令
+        // 优先判断的指令
+        // $template
+        // $css
 
         let templateResult = templateReg.exec(clipboardContent);
 
@@ -331,6 +335,26 @@ export default function () {
             }
 
             return;
+        }
+        else{
+            let
+                htmlTag = htmlTagReg.exec(clipboardContent),
+                classTree = {
+                    tagName:"",
+                    className:"",
+                    children:[]
+                };
+
+            function getChildren(htmlString) {
+                if(htmlString){
+                    while (htmlTag){
+                        let [content,chidren] = htmlTag;
+
+                    }
+                }
+            }
+
+
         }
 
 

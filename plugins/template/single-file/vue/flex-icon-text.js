@@ -19,11 +19,11 @@ function template() {
                 css: `
     .actions{
       display: flex;
-      padding: r(30) 0;
       background-color: #fff;
       .action{
         flex: 1;
         text-align: center;
+        padding: r(30) 0;
         .iconfont{
           font-size: r(40);
           margin-bottom: r(10);
