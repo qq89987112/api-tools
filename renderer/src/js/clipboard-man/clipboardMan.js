@@ -372,7 +372,8 @@ export default function () {
                 regResult = regResult[1];
                 let notice = store.getState().notices[regResult];
 
-                keyboard.output(`\r\n${modifier ? notice.params[modifier] : notice}\r\n`);
+                // keyboard.output(`\r\n${modifier ? notice.params[modifier] : notice}\r\n`);
+                keyboard.output(`${modifier ? notice.params[modifier].trim() : notice}`);
                 return;
             case commandName === 'notices':
                 let {notices} = store.getState();
@@ -382,8 +383,8 @@ export default function () {
                 }, {}))}`).join('\r\n') + "\r\n");
                 return;
             case commandName === 'templates':
-                if (modifier === 'file') {
-                    fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/projects/**/**.js");
+                if (modifier) {
+                    fileAddr = path.join(remote.getGlobal("__dirname"), `../plugins/template/single-file/**/${modifier}/**.js`);
                 } else {
                     fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file/**/**.js");
                 }
@@ -423,7 +424,13 @@ export default function () {
             promise.then(addr => {
 
                 let template = fse.readFileSync(addr, 'utf-8');
-                template = eval(`(${template})`)();
+                try{
+                    template = eval(`(${template})`)();
+                }catch (e) {
+                    console.error(e);
+                    context.error(e.message);
+                    return;
+                }
 
                 let parameters = template.parameters;
 
@@ -431,15 +438,18 @@ export default function () {
                     JSON.stringify(Object.entries(parameters).map(i => i[0]))
                     output(`${commandName}?${Object.entries(parameters).map(i => {
                         let example = '';
-                        switch (i[1]) {
-                            case Array:
-                                example = `${i[0]}=1,2,3,4`;
-                                break;
-                            case String:
-                                example = `${i[0]}=${i[0]}`;
-                                break;
-                            default:
-                                break;
+                        let key = i[0];
+                        if(key!=='rest'){
+                            switch (i[1]) {
+                                case Array:
+                                    example = `${key}=1,2,3,4`;
+                                    break;
+                                case String:
+                                    example = `${key}=${key}`;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                         return example;
                     }).filter(i => i).join("&")}`);
@@ -453,16 +463,21 @@ export default function () {
                     if (value) {
                         templateParams[name] = value;
                     } else {
-                        templateParams[name] = commandParams.rest.shift();
+                        templateParams[name] = commandParams.rest.shift() || undefined;
                     }
                 })
 
                 console.log("模板参数：", templateParams);
 
-                let result = template.compile(templateParams, context);
+                try{
+                    let result = template.compile(templateParams, context);
+                    output(result);
+                }catch (e) {
+                    console.error(e);
+                    context.error(e.message);
+                }
 
 
-                output(result);
             })
         } else {
             context.error(`找不到命令：${commandName}`)

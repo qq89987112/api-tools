@@ -8,7 +8,7 @@ export default {
     make({template, params = [], defaultValues,notices={}}) {
         let typeDefaultValues = {
             Object: '{a:1,b:2,c:3}',
-            Array: '[1,2,3,4,5]',
+            Array: '[1]', // 本是 [1,2,3,4,5] 的,但是为了不写array参数时,默认是一个,就只能这样写了。
             Number: '123',
             String: '"12345"'
         };
