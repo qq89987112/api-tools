@@ -88,6 +88,14 @@ const utils = {
 
 export default function () {
 
+    // 2018-4-28
+    // $css`<div class="a">                                 .a{
+    //      <div class="b">                 =>                  .b{
+    //          <div class="c"></div>                               .c{}
+    //      </div>                                               }
+    // </div>`                                               }
+
+
     // 2018-3-28
     // set?$$0=多行内容
 
@@ -471,7 +479,7 @@ export default function () {
 
                 try{
                     let result = template.compile(templateParams, context);
-                    output(result);
+                    output(result.trim());
                 }catch (e) {
                     console.error(e);
                     context.error(e.message);
