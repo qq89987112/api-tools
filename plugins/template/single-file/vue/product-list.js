@@ -34,7 +34,7 @@ function template() {
           align-items: center;
           align-content: center;
           background-color: #fff;
-          padding: r(20) r(30);
+          padding: r(20);
           height: r(180);
           .product-image {
             width: r(180);
@@ -47,6 +47,7 @@ function template() {
             display: flex;
             flex-direction: column;
             height: 100%;
+            flex: 1;
             .product-title {
 
             }
