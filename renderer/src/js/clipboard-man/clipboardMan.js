@@ -10,6 +10,8 @@ const fse = remote.require("fs-extra");
 const path = remote.require("path");
 const child_process = remote.require("child_process");
 const jsBeautify = remote.require("js-beautify");
+const {parse} = remote.require("himalaya");
+
 // const robot = remote.require("robotjs");
 // const ks = remote.require("node-key-sender");
 
@@ -187,7 +189,6 @@ export default function () {
 //                                       2、setEnv?$projectAddr&D:\code\github\api-tools
 
 
-
     // ks.sendKeys(['a', 'b', 'c']);
 
 
@@ -226,7 +227,7 @@ export default function () {
             lineReg = /.+/g,
             noticeReg = /\$\$([0-19])/,
             templateReg = /\$template`([\s\S]+?)`\?(?:file=(\S+))?/,
-            htmlTagReg = /<[^\/]+>([\s\S]+)<\/.+>/,
+            cssReg = /\$css`([\s\S]+?)`/,
             classTag = /<[^\/\n]+[^:]class="(.+?)"[^\/\n]*>/,
             multiParamsReg = /`([\s\S]+?)`/g,
             line,
@@ -290,7 +291,7 @@ export default function () {
                             type: "Object"
                         })
                     }, []),
-                    notices:templateOption.notify,
+                    notices: templateOption.notify,
                     defaultValues: templateOption.test
                 });
                 output(eval(`(${templateResult})()`).compile({}, context));
@@ -303,32 +304,32 @@ export default function () {
                 //     context.error("请指定$params 您可以将 $test 直接改为 $params");
                 //     return;
                 // }
-                let fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file",file);
+                let fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file", file);
                 templateResult = templateMaker.make({
                     template: templateOption.template,
-                    params: Object.entries(templateOption.params||{}).reduce((prev, cur) => {
+                    params: Object.entries(templateOption.params || {}).reduce((prev, cur) => {
                         let value = cur[1];
-                        value = Object.prototype.toString.call(value).slice(8,-1);
+                        value = Object.prototype.toString.call(value).slice(8, -1);
                         return prev.concat({
                             name: cur[0],
                             type: value
                         })
                     }, []),
-                    notices:templateOption.notify,
+                    notices: templateOption.notify,
                 });
                 let promise = Promise.resolve();
                 if (fse.existsSync(fileAddr)) {
-                    promise = keyboard.options(`文件路径已经存在文件:${fileAddr},是否继续？`,["是","否"]).then((selects)=>{
+                    promise = keyboard.options(`文件路径已经存在文件:${fileAddr},是否继续？`, ["是", "否"]).then((selects) => {
                         let select = selects[0];
-                        if(select===0){
+                        if (select === 0) {
                             return Promise.resolve();
-                        }else{
+                        } else {
                             return Promise.reject();
                         }
                     });
                 }
-                promise.then(()=>{
-                    fse.outputFileSync(fileAddr,jsBeautify.js(templateResult));
+                promise.then(() => {
+                    fse.outputFileSync(fileAddr, jsBeautify.js(templateResult));
                     // 将这个 生成成功 替换为把 template语法去掉之后的原代码
                     keyboard.output("生成成功");
                 })
@@ -336,25 +337,31 @@ export default function () {
 
             return;
         }
-        else{
+        else {
             let
-                htmlTag = htmlTagReg.exec(clipboardContent),
-                classTree = {
-                    tagName:"",
-                    className:"",
-                    children:[]
-                };
+                htmlResult = cssReg.exec(clipboardContent);
+            if (htmlResult) {
+                let html = parse(htmlResult[1]);
 
-            function getChildren(htmlString) {
-                if(htmlString){
-                    while (htmlTag){
-                        let [content,chidren] = htmlTag;
-
-                    }
+                function generateCss(elements=[]){
+                    return elements.map(item=>{
+                        let attributes = item.attributes || [];
+                        let css = attributes.find(i=>i.key==='class');
+                        if(css){
+                            css = css.value;
+                        }
+                        return css&&`.${css}{
+                            ${generateCss(item.children)}
+                        }`
+                    }).filter(i=>i).join("\r\n")
                 }
+                // 当生成成功时,去掉$css``
+                output(htmlResult[1]);
+                let cssResult = generateCss(html);
+                console.log(cssResult);
+                clipboard.writeText(cssResult);
+                return;
             }
-
-
         }
 
 
@@ -456,9 +463,9 @@ export default function () {
             promise.then(addr => {
 
                 let template = fse.readFileSync(addr, 'utf-8');
-                try{
+                try {
                     template = eval(`(${template})`)();
-                }catch (e) {
+                } catch (e) {
                     console.error(e);
                     context.error(e.message);
                     return;
@@ -471,7 +478,7 @@ export default function () {
                     output(`${commandName}?${Object.entries(parameters).map(i => {
                         let example = '';
                         let key = i[0];
-                        if(key!=='rest'){
+                        if (key !== 'rest') {
                             switch (i[1]) {
                                 case Array:
                                     example = `${key}=1,2,3,4`;
@@ -501,10 +508,10 @@ export default function () {
 
                 console.log("模板参数：", templateParams);
 
-                try{
+                try {
                     let result = template.compile(templateParams, context);
                     output(result.trim());
-                }catch (e) {
+                } catch (e) {
                     console.error(e);
                     context.error(e.message);
                 }
