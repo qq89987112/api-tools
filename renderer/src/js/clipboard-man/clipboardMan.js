@@ -350,9 +350,9 @@ export default function () {
                         if(css){
                             css = css.value;
                         }
-                        return css&&`.${css}{
+                        return css?`.${css}{
                             ${generateCss(item.children)}
-                        }`
+                        }`:generateCss(item.children)
                     }).filter(i=>i).join("\r\n")
                 }
                 // 当生成成功时,去掉$css``
