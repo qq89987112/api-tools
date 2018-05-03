@@ -18,7 +18,7 @@ function template() {
       display: flex;
       background-color: #fff;
       .action{
-        padding: r(30) 0;
+        padding: r(20) 0;
         flex: 1;
         text-align: center;
       }
