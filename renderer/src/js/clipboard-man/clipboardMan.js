@@ -227,7 +227,7 @@ export default function () {
             lineReg = /.+/g,
             noticeReg = /\$\$([0-19])/,
             templateReg = /\$template`([\s\S]+?)`\?(?:file=(\S+))?/,
-            cssReg = /[^\$]\$css`([\s\S]+?)`/,//\$[^\$]\S*
+            cssReg = /^\$css`([\s\S]+?)`/,//\$[^\$]\S*
             classTag = /<[^\/\n]+[^:]class="(.+?)"[^\/\n]*>/,
             multiParamsReg = /`([\s\S]+?)`/g,
             line,
