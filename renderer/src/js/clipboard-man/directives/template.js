@@ -8,7 +8,7 @@ const jsBeautify = remote.require("js-beautify");
 const fse = remote.require("fs-extra");
 
 export default {
-    validate:/^\$template`([\s\S]+?)`\?(?:file=(\S+))?/,
+    validate:/\$template`([\s\S]+?)`\?(?:file=(\S+))?/,
     handle(result){
         let
             clipboardContent = clipboard.readText(),
