@@ -1,94 +1,29 @@
-import {TemplateJSFile} from "../../views/ProjectTemplate";
-import store from "../../store/index"
-import keyboard from "../vbs/keyboard";
-import templateMaker from "../templateMaker";
-
-
+import keyboard from "./js/keyboard";
+import utils from "./js/utils";
+import directives from "./directives";
+import context from "./js/context";
 const {clipboard, remote} = window.require('electron');
 const glob = remote.require("glob").sync;
 const fse = remote.require("fs-extra");
 const path = remote.require("path");
 const child_process = remote.require("child_process");
-const jsBeautify = remote.require("js-beautify");
-const {parse} = remote.require("himalaya");
-
-// const robot = remote.require("robotjs");
-// const ks = remote.require("node-key-sender");
 
 
-const utils = {
-    /**
-     *
-     * @param line
-     * @return [objectName,object]
-     * 其中 object 格式为
-     *         {
-     *               modifier:'file',
-     *               fields:['姓名','年龄','性别','职业'],
-     *               operation:[{
-     *                   value:'删除',
-     *                   modifier:'confirm'
-     *               },"更新"],
-     *               rest:[],
-     *               其他命令
-     *               $notify:{
-     *
-     *               }
-     *           }
-     *  除了command的名字外，都在object中。
-     */
-    parseLineToObject(line) {
-        let
-            templateNameReg = /(?:(\S+)\?)|(?:(.+))/,
-            templateNameStr = templateNameReg.exec(line);
-        templateNameStr = templateNameStr.filter(i => i);
-        let
-            [name, modifier] = templateNameStr[1].split("."),
-            tempParams,
-            params = JSON.parse(JSON.stringify({modifier, rest: []}));
-
-        line = line.replace(templateNameStr[0], "");
-        tempParams = line.split("&");
-
-        // 获取参数
-        tempParams.reduce((prev, cur) => {
-            cur = cur.split("=");
-            let [name, value] = cur;
-            let originValue = value;
-            if (!value) {
-                value = name;
-                name = undefined;
-            }
-
-            //将 a,b,c 变为数组
-            value = value.split(/[,，]/).map(i => {
-                // 获取参数的修饰器
-                const [name, modifier] = i.split(".")
-                return modifier ? {
-                    name,
-                    modifier
-                } : name
-            });
-
-            if (value.length <= 1) {
-                value = value[0];
-            }
-
-            if (!originValue) {
-                prev.rest = prev.rest.concat(value);
-            } else {
-                let [tempName, modifier] = name.split(".");
-                prev[tempName] = modifier ? {modifier, value} : value;
-            }
-            return prev
-        }, params);
-
-        return [name, params];
-    }
-}
 
 
 export default function () {
+    // 2018-05-11
+    // 主要是以 ui测试api 为驱动。
+    //
+    // 全局变量要求填写notifyApiFolder
+    // $api?url='/edit/title'&file='title'   =>  title.title().then(d=>{
+    //
+    //                                                  })
+    //     //$api.list?test='/edit/title' 生成list页面
+    //
+    //
+
+
     // 2018-05-10
     // 新增行情接口
     // http://hq.sinajs.cn/list=M0
@@ -199,27 +134,7 @@ export default function () {
     // 每一行都可以解析成对象
     let
         tempClipboardContent = clipboard.readText(),
-        clipboardContent,
-        output = keyboard.output,
-        context = {
-            error(msg) {
-                output(`error:${msg}`);
-            },
-            showOptionsForResult(list) {
-                return keyboard.options('有多个地址,请选择其中一个', list);
-            },
-            notify(path, events, params, options) {
-                if (params) {
-                    // 测试时暂时这么写。
-                    store.dispatch({
-                        type: "NOTICE_ADD",
-                        notice: {
-                            path, events, params, options
-                        }
-                    })
-                }
-            }
-        };
+        clipboardContent;
 
     // child_process.execSync("wscript ./main/test.vbs");
     child_process.execSync("wscript ./main/copy.vbs");
@@ -227,149 +142,18 @@ export default function () {
 
 
     try {
-        // 优先判断的指令
-        // $template
-        // $css
-        // $stock.m0
 
         let
             lineReg = /.+/g,
-            headCommands = {
-                //$css
-                [/^\$css`([\s\S]+?)`/]:function (result) {
-
-                    let html = parse(result[1]);
-                    function generateCss(elements=[]){
-                        // 对象里头的函数代码无法被编译成低版本的JS？
-                        elements = elements || [];
-                        return elements.map(item=>{
-                            let attributes = item.attributes || [];
-                            let css = attributes.find(i=>i.key==='class');
-                            if(css){
-                                css = css.value;
-                            }
-                            return css?`.${css}{
-                            ${generateCss(item.children)}
-                        }`:generateCss(item.children)
-                        }).filter(i=>i).join("\r\n")
-                    }
-                    // 当生成成功时,去掉$css``
-                    let cssResult = generateCss(html);
-                    console.log(cssResult);
-                    output(result[1]);
-                    clipboard.writeText(cssResult);
-                },
-                //$template
-                [/\$template`([\s\S]+?)`\?(?:file=(\S+))?/]:function (result) {
-                    let
-                        templateOption = {
-                            template: result[1],
-                            notify: {}
-                        },
-                        file = result[2],
-                        noticeReg = /\$\$(.+?)`([\s\S]+?)`/g,
-                        paramsReg = /\$params\?.+/,
-                        testReg = /\$test\??.*/,    // ? 可有可无
-                        paramsResult = paramsReg.exec(clipboardContent),
-                        testResult = testReg.exec(clipboardContent),
-                        noticeResult,
-                        name, params;
-
-                    // function toObject(paramsResult) {
-                    //     return paramsResult[1].split("&").reduce((prev, cur) => {
-                    //         cur = cur.split("=");
-                    //         prev[cur[0]] = cur[1];
-                    //         return prev;
-                    //     }, {});
-                    // }
-                    if (testResult) {
-                        [name, params] = utils.parseLineToObject(testResult[0]);
-                        templateOption.test = params;
-                    }
-
-                    while (noticeResult = noticeReg.exec(clipboardContent)) {
-                        templateOption.notify[noticeResult[1]] = noticeResult[2];
-                    }
-
-
-                    if (paramsResult) {
-                        [name, params] = utils.parseLineToObject(paramsResult[0]);
-                        templateOption.params = params;
-                    }
-
-
-                    if (templateOption.test) {
-                        result = templateMaker.make({
-                            template: `${templateOption.template}
-                        以上是生成的测试内容,生成文件需要(非必须)的$params就是$test时的所用的内容。
-                    `,
-                            params: Object.entries(templateOption.test || {}).reduce((prev, cur) => {
-                                return prev.concat({
-                                    name: cur[0],
-                                    type: "Object"
-                                })
-                            }, []),
-                            notices: templateOption.notify,
-                            defaultValues: templateOption.test
-                        });
-                        output(eval(`(${result})()`).compile({}, context));
-                    } else {
-                        if (!file) {
-                            context.error("请指定file 或者 先测试。");
-                            return;
-                        }
-                        // if (!templateOption.params) {
-                        //     context.error("请指定$params 您可以将 $test 直接改为 $params");
-                        //     return;
-                        // }
-                        let fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file", file);
-                        result = templateMaker.make({
-                            template: templateOption.template,
-                            params: Object.entries(templateOption.params || {}).reduce((prev, cur) => {
-                                let value = cur[1];
-                                value = Object.prototype.toString.call(value).slice(8, -1);
-                                return prev.concat({
-                                    name: cur[0],
-                                    type: value
-                                })
-                            }, []),
-                            notices: templateOption.notify,
-                        });
-                        let promise = Promise.resolve();
-                        if (fse.existsSync(fileAddr)) {
-                            promise = keyboard.options(`文件路径已经存在文件:${fileAddr},是否继续？`, ["是", "否"]).then((selects) => {
-                                let select = selects[0];
-                                if (select === 0) {
-                                    return Promise.resolve();
-                                } else {
-                                    return Promise.reject();
-                                }
-                            });
-                        }
-                        promise.then(() => {
-                            fse.outputFileSync(fileAddr, jsBeautify.js(result));
-                            // 将这个 生成成功 替换为把 template语法去掉之后的原代码
-                            keyboard.output("生成成功");
-                        })
-                    }
-                },
-                //$stock.M0
-                [/^\$stock\.(.+)/]:function (result) {
-
-                }
-            },
-            noticeReg = /\$\$([0-19])/,
-            multiParamsReg = /`([\s\S]+?)`/g,
             line,
-            variables = {},
             commandOption = {};
 
 
-        if (Object.entries(headCommands).find(i => {
-            let reg = eval(i[0]);
-            let result = reg.exec(clipboardContent)
+        if (Object.values(directives).find(i => {
+            let reg = i.validate;
+            let result = reg.exec(clipboardContent);
             if (result) {
-                i[1](result);
+                i.handle(result);
             }
             return result;
         })) {
@@ -377,17 +161,12 @@ export default function () {
         }
 
 
+        //  模版命令解析开始。
+        //  默认支持多行格式。
+        //  Form?filed=姓名，年龄，性别，职业
+        //  notify?path='D:\code\github\api-tools\renderer\src\js\clipboardMan.js'&slots=$$0,$$1    其中 $$0,$$1 是最近记录中生成的slot
+        //  第二行开始是复杂参数的解析
 
-        // 多行参数命令特殊,需要放在代码前头处理。
-        // let index = 0;
-        // clipboardContent.replace(multiParamsReg, (match, extract, index, source) => {
-        //     let key = `$$_${index++}`;
-        //     variables[key] = extract;
-        //     return match.replace(extract, key)
-        // });
-
-
-        //  第一行是命令,第二行开始
         while (line = lineReg.exec(clipboardContent)) {
             line = line[0];
 
@@ -405,51 +184,10 @@ export default function () {
         // 从这里开始,有了context变量。
         let
             entries = Object.entries(commandOption),
-            [commandName, commandParams] = entries[0];
-
-
-        // 一、单独使用 $$0 的情况
-        //$$0.add
-        //$$0.update
-        // 二、使用notices查看notices列表
-
-        // 一些功能性的指令
-        let
-            regResult,
+            [commandName, commandParams] = entries[0],
             modifier = commandParams.modifier,
             fileAddr;
 
-        switch (true) {
-            case !!(regResult = noticeReg.exec(commandName)):
-                regResult = regResult[1];
-                let notice = store.getState().notices[regResult];
-
-                // keyboard.output(`\r\n${modifier ? notice.params[modifier] : notice}\r\n`);
-                keyboard.output(`${modifier ? notice.params[modifier].trim() : notice}`);
-                return;
-            case commandName === 'notices':
-                let {notices} = store.getState();
-                keyboard.output("\r\n" + notices.map((item, index) => `$$${index}：${JSON.stringify(Object.entries(item.params).reduce((prev, cur) => {
-                    prev[cur[0]] = modifier ? cur[1].slice(0, modifier) : '...';
-                    return prev;
-                }, {}))}`).join('\r\n') + "\r\n");
-                return;
-            case commandName === 'templates':
-                if (modifier) {
-                    fileAddr = path.join(remote.getGlobal("__dirname"), `../plugins/template/single-file/**/${modifier}/**.js`);
-                } else {
-                    fileAddr = path.join(remote.getGlobal("__dirname"), "../plugins/template/single-file/**/**.js");
-                }
-                let templates = glob(fileAddr);
-                keyboard.output("\r\n目前的模板列表如下：\r\n" + templates.map((item, index) => `${index + 1}：${item}`).join('\r\n') + "\r\n");
-                return;
-            case commandName === 'set':
-                // 名字需要以$开头。
-                // set?$$0=asdfasd&$sc=SideContainer
-                return;
-            default:
-                break;
-        }
 
         if (modifier === 'file') {
             fileAddr = path.join(remote.getGlobal("__dirname"), `../plugins/template/projects/**/*${commandName}*.js`);
@@ -467,7 +205,7 @@ export default function () {
                 promise,
                 addr;
             if (addrs.length > 1) {
-                promise = context.showOptionsForResult(addrs).then(selects => addrs[selects[0]])
+                promise = keyboard.options('有多个地址,请选择其中一个', addrs).then(selects => addrs[selects[0]])
             } else {
                 addr = addrs[0];
                 promise = Promise.resolve(addr);
@@ -480,15 +218,15 @@ export default function () {
                     template = eval(`(${template})`)();
                 } catch (e) {
                     console.error(e);
-                    context.error(e.message);
+                    keyboard.output(e.message);
                     return;
                 }
 
                 let parameters = template.parameters;
 
                 if (commandParams.modifier === 'demo') {
-                    JSON.stringify(Object.entries(parameters).map(i => i[0]))
-                    output(`${commandName}?${Object.entries(parameters).map(i => {
+                    JSON.stringify(Object.entries(parameters).map(i => i[0]));
+                    keyboard.output(`${commandName}?${Object.entries(parameters).map(i => {
                         let example = '';
                         let key = i[0];
                         if (key !== 'rest') {
@@ -517,28 +255,26 @@ export default function () {
                     } else {
                         templateParams[name] = commandParams.rest.shift() || undefined;
                     }
-                })
+                });
 
                 console.log("模板参数：", templateParams);
 
                 try {
                     let result = template.compile(templateParams, context);
-                    output(result.trim());
+                    keyboard.output(result.trim());
                 } catch (e) {
                     console.error(e);
-                    context.error(e.message);
+                    keyboard.output(e.message);
                 }
-
-
             })
         } else {
-            context.error(`找不到命令：${commandName}`)
+            keyboard.output(`找不到命令：${commandName}`)
         }
 
 
         clipboard.writeText(tempClipboardContent);
     } catch (e) {
         console.error(e);
-        context.error(e.message);
+        keyboard.output(e.message);
     }
 }

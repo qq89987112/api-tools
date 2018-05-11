@@ -25,6 +25,7 @@ function template() {
         padding: 0 r(20);
         display: inline-block;
         color: white;
+        cursor: pointer;
       }
     }`
             });
