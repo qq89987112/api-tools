@@ -3,7 +3,7 @@ import store from "../../../store";
 import utils from "../js/utils";
 
 export default {
-    validate:/\$\$([0-19])/,
+    validate:/\$\$([0-19]).+/,
     handle(result){
         let [name,params] = utils.parseLineToObject(result[0]);
         let modifier = params.modifier;
