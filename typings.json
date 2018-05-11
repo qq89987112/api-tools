@@ -1,0 +1,6 @@
+{
+  "name": "init",
+  "dependencies": {
+    "fs-extra": "registry:dt/fs-extra#2.0.0+20170306033830"
+  }
+}
