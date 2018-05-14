@@ -17,8 +17,12 @@ function template() {
             });
             return `
             axios.interceptors.response.use(res=>{
-  return res.data.data;
-})
+  if(res.data.code===200){
+    return res.data.data;
+  }else{
+    return Promise.reject(res.data);
+  }
+});
         `
         }
     }
