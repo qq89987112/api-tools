@@ -16,12 +16,22 @@ function template() {
 
             });
             return `
-            axios.interceptors.response.use(res=>{
+            import axios from "axios"
+
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.interceptors.request.use(config=>{
+  return config;
+});
+
+
+axios.interceptors.response.use(res=>{
   if(res.data.code===200){
     return res.data.data;
   }else{
-    return Promise.reject(res.data);
+    return Promise.reject(res.data.data);
   }
+},res=>{
+  return Promise.reject(res.response.data);
 });
         `
         }
