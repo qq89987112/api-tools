@@ -19,13 +19,14 @@ function template() {
       margin-left: 15px;
     }
     .button{
-      background-color: #ee5544;
+      background-color: #20a0ff;
       border-radius: 4px;
       line-height: 2em;
       padding: 0 10px;
       display: inline-block;
       color: white;
       cursor: pointer;
+      border: none;
     }
   }
 

@@ -11,9 +11,10 @@ export default {
     validate:/\$template`([\s\S]+?)`\?(?:file=(\S+))?/,
     handle(result){
         let
+            orginText = result[1],
             clipboardContent = clipboard.readText(),
             templateOption = {
-                template: result[1],
+                template: orginText,
                 notify: {}
             },
             file = result[2],
@@ -99,7 +100,7 @@ export default {
             promise.then(() => {
                 fse.outputFileSync(fileAddr, jsBeautify.js(result));
                 // 将这个 生成成功 替换为把 template语法去掉之后的原代码
-                keyboard.output("生成成功");
+                keyboard.output(orginText);
             })
         }
     }}

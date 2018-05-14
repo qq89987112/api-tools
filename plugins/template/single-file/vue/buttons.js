@@ -26,6 +26,7 @@ function template() {
         display: inline-block;
         color: white;
         cursor: pointer;
+        border: none;
       }
     }`
             });
