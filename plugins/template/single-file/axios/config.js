@@ -25,10 +25,11 @@ axios.interceptors.request.use(config=>{
 
 
 axios.interceptors.response.use(res=>{
+  let data = res.data.data||res.data;
   if(res.data.code===200){
-    return res.data.data;
+    return data;
   }else{
-    return Promise.reject(res.data.data);
+    return Promise.reject(data);
   }
 },res=>{
   return Promise.reject(res.response.data);
