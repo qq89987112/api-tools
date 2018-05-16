@@ -32,6 +32,4 @@ export default class Template {
     getContent(){
         return this.xmlTemplate._;
     }
-
-
 }
