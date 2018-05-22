@@ -16,24 +16,43 @@ function template() {
 
             });
             return `
-            import axios from "axios"
+ import axios from "axios"
+import { Notification } from 'element-ui';
 
-// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-axios.interceptors.request.use(config=>{
+if(localStorage.debug){
+    axios.defaults.baseURL = 'http://192.168.1.112:8076';
+}
+
+axios.interceptors.request.use(config => {
   return config;
 });
 
 
-axios.interceptors.response.use(res=>{
-  let data = res.data.data||res.data;
-  if(res.data.code===200){
+axios.interceptors.response.use(res => {
+  // 后面是匹配没有遵循code data 格式的
+  let data = res.data.data || res.data;
+
+  // 遵循 code data 的需要200才能对，不遵循的直接放过
+  if (res.data.status || res.data.code===undefined) {
     return data;
-  }else{
+  } else {
+    Notification({
+      message: data.message,
+      type: 'error'
+    })
     return Promise.reject(data);
   }
-},res=>{
-  return Promise.reject(res.response.data);
+}, res => {
+  res = res.response;
+  // 后面是匹配没有遵循code data 格式的
+  let data = res.data.data || res.data;
+  Notification({
+    message: data.message,
+    type: 'error'
+  })
+  return Promise.reject(res.data);
 });
+
         `
         }
     }
