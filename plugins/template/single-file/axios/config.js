@@ -20,7 +20,8 @@ import axios from "axios"
 import { Notification } from 'element-ui';
 
 if(localStorage.debug){
-    axios.defaults.baseURL = 'http://192.168.1.135:8076/';
+  // axios.defaults.baseURL = 'http://192.168.1.135:8076/';
+  axios.defaults.baseURL = 'http://192.168.1.112:8076';
 }
 
 axios.interceptors.request.use(config => {
@@ -54,7 +55,7 @@ axios.interceptors.response.use(res => {
   })
   return Promise.reject(res.data);
 });
-
+            
         `
         }
     }
