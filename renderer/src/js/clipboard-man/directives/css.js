@@ -2,6 +2,8 @@ import keyboard from "../js/keyboard";
 const {clipboard, remote} = window.require('electron');
 const glob = remote.require("glob").sync;
 const {parse,stringify} = remote.require("himalaya");
+const scssfmt = remote.require('scssfmt')
+
 /**
  * test
  * 
@@ -44,5 +46,5 @@ export default {
         let cssResult = generateCss(html);
         console.log(cssResult);
         keyboard.output(result[1].replace(/style=["'].+?["'] ?/g,""));
-        clipboard.writeText(cssResult);
+        clipboard.writeText(scssfmt(cssResult));
     }}
