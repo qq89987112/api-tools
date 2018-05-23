@@ -8,6 +8,7 @@ const {parse,stringify} = remote.require("himalaya");
  *  $css`
  *      <div style="margin-right:10px;" class="a" >
  *          <div class="b" style="background:red;"></div>
+ *          <div class="c">
  *      </div>
  *  `
  * 
