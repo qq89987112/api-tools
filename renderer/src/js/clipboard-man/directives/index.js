@@ -6,6 +6,7 @@ import stock from "./stock"
 import template from "./template"
 import templates from "./templates"
 import global from "./global"
+import rss from "./rss"
 
 export default {
     api,
@@ -15,5 +16,6 @@ export default {
     stock,
     template,
     templates,
-    global
+    global,
+    rss
 }

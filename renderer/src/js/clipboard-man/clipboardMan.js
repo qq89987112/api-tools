@@ -150,11 +150,15 @@ export default function () {
 
 
         if (Object.values(directives).find(i => {
-            let reg = i.validate;
-            let result = reg.exec(clipboardContent);
-            if (result) {
-                i.handle(result);
+            let 
+                reg = i.validate,
+                result;
+            if(reg instanceof Function){
+                result = reg(clipboardContent);
+            }else{
+                result = reg.exec(clipboardContent);
             }
+            result&&i.handle(result);
             return result;
         })) {
             return;
