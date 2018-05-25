@@ -17,7 +17,7 @@ let createWindow = () => {
     });
     global.mainWindow = mainWindow;
     global.__dirname = __dirname;
-    mainWindow.maximize();
+    // mainWindow.maximize();
     mainWindow.loadURL(`${global.baseURL}/#/`);
     // mainWindow.loadURL('http://www.501wan.com/start/2217.html');
 

@@ -68,7 +68,7 @@ export default {
                     keyboard.output(data.map((i,idx)=>`
 ${idx+1}. ${i.title}
     ${i.items.slice(0,5).map((i2,idx2)=>`
-    ${idx2+1}. ${i2.title}
+    ${idx2+1}. ${i2.title}    ${i2.link}
     ${i2.content}`).join("\n")}`).join("\n")+"\n")
                 })
             }
